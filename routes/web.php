@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ChequeController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EntrepriseController;
 use App\Http\Controllers\EspaceClientController;
+use App\Http\Controllers\AdministrateurController;
 use App\Http\Controllers\TaxeEntrepriseController;
 use App\Http\Controllers\PaiementInitialController;
 
@@ -56,6 +56,11 @@ Route::middleware('auth')->group(function () {
         Route::controller(DashboardController::class)->group(function () {
             Route::get('/dashboard', 'index')->name('dashboard');
             Route::get('/inscription', 'listeInscription')->name('inscription');
+        });
+
+
+        Route::controller(AdministrateurController::class)->group(function (){
+            Route::get('/listedesAdministrateur','index')->name('administrateur.index');
         });
 
         Route::controller(EntrepriseController::class)->group(function () {
@@ -110,7 +115,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 
-    
+
 });
 
 require __DIR__.'/auth.php';

@@ -218,15 +218,18 @@ class EntrepriseController extends Controller
 
                     $existe = Entreprise::where('raison_sociale', $row['raison_sociale'])
                         ->orWhere('secteur_numero_rapport', $row['secteur_n_de_rapport'])
+                        ->where('telephone',$telephone )
+                        ->where('telephone_2',$telephone2 )
                         ->first();
 
                     if ($existe) {
                         $taxeExistante = TaxeEntreprise::where('entreprise_id', $existe->id)
-                            ->where('annee', $row['annee'])
-                            ->where('montant', $row['montant'])
-                            ->where('annee_depot_taxe', $row['annee_de_depot_de_la_taxe'])
-                            ->where('semestre_depose', $row['semestre_depose'])
-                            ->where('date_depot', $dateDepot)
+                             ->where('semestre_depose', $row['semestre_depose'])
+                             ->where('annee', $row['annee'])
+                             ->where('localisation', $row['localisation'])
+                             ->where('annee_depot_taxe', $row['annee_de_depot_de_la_taxe'])
+                             ->where('date_depot', $dateDepot)
+                             ->where('montant', $row['montant'])
                             ->where('date_limite_payement', $dateLimite)
                             ->first();
 

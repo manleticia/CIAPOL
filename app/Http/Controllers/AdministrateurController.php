@@ -14,6 +14,10 @@ class AdministrateurController extends Controller
     public function index()
     {
         //
+        $administrateurs = Administrateur::all();
+        $title ='Liste administrateurs';
+        // dd($administrateurs);
+        return view('dashboards.administrateurs.index',compact('administrateurs','title'));
     }
 
     /**
