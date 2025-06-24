@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('inscrits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('entreprise_id')->nullable()->constrained('entreprises', 'id');
+             $table->foreignId('administrateur_id')->nullable()->constrained('administrateurs', 'id');
             $table->string('libelle')->nullable();
             $table->string('ancien_libelle')->nullable();
             $table->string('email')->nullable();

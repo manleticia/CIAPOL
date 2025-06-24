@@ -1,5 +1,8 @@
 <?php
+
 use App\Models\PaiementInitial;
+use Illuminate\Support\Facades\File;
+
 function appelApiEmail()
 {
     $exe = 'REEL';
@@ -82,4 +85,48 @@ function genereCodePaiement($length = 10)
     } while ($existingCode);
 
     return $randomString;
+}
+
+
+function genererMotDePasse($longueur = 10)
+{
+    // Ensemble de caractères possibles
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+';
+
+    // Mélange et sélection aléatoire
+    return substr(str_shuffle(str_repeat($alphabet, ceil($longueur / strlen($alphabet)))), 0, $longueur);
+}
+
+
+
+function urlSite()
+{
+    $exe = 'LOCAL';
+    $exe = 'REEL';
+    if ($exe == 'REEL') {
+        return "https://www.mafacture.ciapol-ci.com/";
+    } else {
+        return "http://127.0.0.1:8000/";
+    }
+}
+
+if (!function_exists('delete_file')) {
+    function delete_file($url)
+    {
+        if (File::exists(public_path($url))) {
+            File::delete(public_path($url));
+        }
+    }
+}
+
+function getIp()
+{
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
 }

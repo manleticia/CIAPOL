@@ -41,9 +41,7 @@
                                 <tr>
                                     <th>N</th>
                                     <th>Raison Sociale</th>
-                                    <th>Secteur N° Rapport</th>
                                     <th>Inspection</th>
-                                    <th>Lieu de dépôt</th>
                                     <th>Téléphone</th>
                                     <th>Téléphone 2</th>
                                     <th>Statut</th>
@@ -53,13 +51,15 @@
                             <tbody>
                                 @foreach ($entreprises as $ind => $entreprise)
                                     <tr>
+
+                                        @php
+                                            // dd($entreprise);
+                                        @endphp
                                         <td>{{ $ind + 1 }}</td>
-                                        <td>{{ $entreprise->raison_sociale }}</td>
-                                        <td>{{ $entreprise->secteur_numero_rapport }}</td>
-                                        <td>{{ $entreprise->inspection }}</td>
-                                        <td>{{ $entreprise->lieu_de_depot }}</td>
-                                        <td>{{ $entreprise->telephone }}</td>
-                                        <td>{{ $entreprise->telephone_2 }}</td>
+                                        <td>{{ $entreprise->raison_sociale ?? ""}}</td>
+                                        <td>{{ $entreprise->inspection  ?? ""}}</td>
+                                        <td>{{ $entreprise->telephone ?? ""}}</td>
+                                        <td>{{ $entreprise->telephone_2 ?? "" }}</td>
                                         <td>
                                             <span class="badge bg-{{ $entreprise->status == 1 ? 'success' : 'danger' }}">
                                                 {{ $entreprise->status == 1 ? 'Active' : 'Inactive' }}

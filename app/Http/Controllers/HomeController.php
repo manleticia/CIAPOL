@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logs;
 use App\Models\User;
 use App\Models\Inscrit;
 use App\Models\Entreprise;
@@ -106,13 +107,13 @@ class HomeController extends Controller
                 if ($code != 200) {
                     $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
                     // Log::ajoutLOG($message);
-                    // $module = "Envoyer de Mail a la creation Mutualiste";
-                    // $action = "Echec d'envoyer de mail  : $message";
-                    // Logs::saveLog($module, $action);
+                    $module = "Envoyer de Mail a la creation client Entreprise ";
+                    $action = "Echec d'envoyer de mail  : $message";
+                    Logs::saveLog($module, $action);
                 } else {
-                    // $module = "Envoyer de Mail a la creation Mutualiste";
-                    // $action = "Email envoyer avec success   : $mutualiste->nom , $mutualiste->prenom sur son email  $mutualiste->email";
-                    // Logs::saveLog($module, $action);
+                    $module = "Envoyer de Mail a la creation client Entreprise";
+                    $action = "Email envoyer avec success   : $inscrit->libelle sur son email  $inscrit->email";
+                    Logs::saveLog($module, $action);
                 }
             } else {
                 Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
@@ -216,7 +217,8 @@ class HomeController extends Controller
     public function connexionAdministrateur(AdministrateurLoginRequest $request)
     {
         try {
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)
+                ->first();
 
             // dd($user);
             if (!$user) {
@@ -236,8 +238,18 @@ class HomeController extends Controller
             if ($user->hasRole('super-administrateur') || $user->hasRole('administrateur')) {
                 Log::info('Accès administrateur autorisé', ['user_id' => $user->id]);
 
+                $admin = Administrateur::find($user->administrateur->id);
+                if ($admin->status == 2) {
+                    Log::error('Relation administrateur manquante', ['user_id' => $user->id]);
+                    Auth::logout();
+                    return back()->withErrors(['error' => 'Profil administrateur desactive Veuillez contactez les adminstrateurs.']);
+                }
+
                 if ($user->administrateur) {
                     $user->administrateur->update(['disponibilite' => 'en ligne']);
+                    $module = "Module Connexion  ";
+                    $action = "es connecter  ";
+                    Logs::saveLog($module, $action);
                     return redirect()->route('dashboard');
                 }
 
@@ -248,7 +260,9 @@ class HomeController extends Controller
 
             if ($user->hasRole('entreprise')) {
                 Log::info('Accès entreprise autorisé', ['user_id' => $user->id]);
-
+                $module = "Module Connexion  ";
+                $action = "es connecter  ";
+                Logs::saveLog($module, $action);
                 return redirect()->route('espaceClient.index');
             }
 
@@ -313,6 +327,9 @@ class HomeController extends Controller
             $mess = ' Paiement échoué. Si votre compte a été débité, nous vous prions' .
                 ' de contacter le support avec la reference: ' . $paiement->codePaiement;
         }
+        $module = "Module Paiement  ";
+        $action = "A consulter la page retour de paiement";
+        Logs::saveLog($module, $action);
         return view('vitrines.resutltatPay', compact('code', 'mess', 'paiement'));
     }
 
@@ -323,6 +340,9 @@ class HomeController extends Controller
         $paiement = PaiementInitial::where('codePaiement', $codePaiement)->first();
         $infos = Entreprise::where('id', $paiement->entreprise_id)->first();
         // dd($codePaiement,$paiement,$infos);
+        $module = "Module Paiement  ";
+        $action = "A consulter le recu d'un paiement   ";
+        Logs::saveLog($module, $action);
         return view('vitrines.recu', compact('infos', 'paiement'));
     }
 }

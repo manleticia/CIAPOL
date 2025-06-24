@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logs;
 use App\Models\Paiement;
 use Illuminate\Http\Request;
 use App\Models\TaxeEntreprise;
@@ -24,6 +25,9 @@ class PaiementInitialController extends Controller
             ->get();
         $title = ' Liste des paiements effectués';
         // dd($paiements);
+        $module = "Module Paiement  ";
+        $action = "A consulter la listes de paiements";
+        Logs::saveLog($module, $action);
         return view('dashboards.paiements.index', compact('paiements', 'title'));
     }
 
@@ -88,7 +92,8 @@ class PaiementInitialController extends Controller
             $libelle = "";
             if ($request->idtaxe) {
                 $installation = TaxeEntreprise::findOrFail($request->idtaxe);
-                $libelle = "Paiement de la facture  : $installation->semestre_depose  de l'entreprise  $us->raison_sociale ";
+                $libelle = "Paiement de la facture  : $installation->periode  de l'entreprise  $us->raison_sociale ";
+                // $libelle = $installation->numero_titre_facture;
                 $montant = $request->montant ?? $installation->montant;
             } else {
                 $libelle = "Paiement Total des Facture de l'entreprise : $us->raison_sociale";
@@ -134,20 +139,31 @@ class PaiementInitialController extends Controller
                 if ($ResJSON['code'] === 200) {
                     // Redirection sur le hub de paiement
                     if (!empty($ResJSON['url'])) {
+                        $module = "Module Paiement  ";
+                        $action = "A consulter le hub de paiement ";
+                        Logs::saveLog($module, $action);
                         return redirect()->away($ResJSON['url']);
                     } else {
                         $mess = "Echec d'authentification pour acceder à la page demandée !";
                         // toas($mess,'success');
-                        return redirect()->back()->with('error', $mess);
+                        $code = $ResJSON['code'];
+                        return view('dashboards.errors.index', compact('code', 'mess'));
                     }
                 } else {
                     $mess = $ResJSON['message'];
-                    // toast($mess,'error');
-                    return redirect()->back()->with('error', $mess);
+
+                    $code = $ResJSON['code'];
+                    return view('dashboards.errors.index', compact('code', 'mess'));
                 }
             }
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erreur lors de la génération du code de paiement : ' . $e->getMessage());
+            $module = "Module Paiement  ";
+            $mess = 'Erreur lors de la génération du code de paiement : ' . $e->getMessage();
+            $action = $mess;
+            Logs::saveLog($module, $action);
+            $code = 404;
+            return view('dashboards.errors.index', compact('code', 'mess'));
         }
         // return view('paiement.hub');
     }
@@ -245,6 +261,10 @@ class PaiementInitialController extends Controller
                     $paiementinit->message_retour =  "Echec du paiement";
                 }
                 $paiementinit->save();
+
+                $module =" Module Paiement";
+                $action = 'a Effectuer un paiement succes sur le hub : ';
+                Logs::saveLog($module, $action);
             } else {
                 $Chaine .= "\n//// verification code paiement:#" . $codePaiement . "# introuvable ou déjà notifié dans 'paiement_en_attentes'";
                 //       $log = new Logs();
@@ -252,6 +272,9 @@ class PaiementInitialController extends Controller
                 // $log->contenu = $Chaine;
                 // $log->titre = "Log callback paiement";
                 // $log->save();
+                 $module =" Module Paiement";
+                $action =  $Chaine ;
+                Logs::saveLog($module, $action);
             }
         } catch (\Throwable $e) {
             $Chaine .= "\n/// Une erreur s'est produite. DETAIL_ERR: " . $e->getMessage();
@@ -260,6 +283,9 @@ class PaiementInitialController extends Controller
             //     $log->contenu = $Chaine;
             //     $log->titre = "Log callback paiement";
             //     $log->save();
+                      $module =" Module Paiement";
+                $action =  $Chaine ;
+                Logs::saveLog($module, $action);
         }
 
         return 'Ok';

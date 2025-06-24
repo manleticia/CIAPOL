@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Entreprise;
+use App\Models\Administrateur;
 use App\Models\TaxeEntreprise;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -22,5 +23,9 @@ class PaiementInitial extends Model
     public function taxeEntreprise(): BelongsTo
     {
         return $this->belongsTo(TaxeEntreprise::class);
+    }
+        public function administrateur(): BelongsTo
+    {
+        return $this->belongsTo(Administrateur::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Entreprise;
+use App\Models\Administrateur;
 use App\Models\TaxeEntreprise;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -18,6 +19,10 @@ class Cheque extends Model
     public function entreprise(): BelongsTo
     {
         return $this->belongsTo(Entreprise::class);
+    }
+    public function administrateur(): BelongsTo
+    {
+        return $this->belongsTo(Administrateur::class);
     }
     public function taxeEntreprise(): BelongsTo
     {

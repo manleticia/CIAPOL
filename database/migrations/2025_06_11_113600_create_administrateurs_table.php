@@ -13,14 +13,17 @@ return new class extends Migration
     {
         Schema::create('administrateurs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users', 'id');
+            $table->foreignId('user_id')->nullable()->constrained('users', 'id');
             $table->string('nom');
             $table->string('prenom');
             $table->string('contact')->unique();
             $table->string('email')->unique();
             $table->string('adresse')->nullable();
             $table->string("genre");
+            $table->bigInteger("id_parains");
             $table->string("lien_photo")->nullable();
+            $table->string('codeLiens')->nullable();
+            $table->string('profil')->nullable();
             $table->enum('disponibilite', ['hors ligne', 'en ligne'])->default('hors ligne');
             $table->enum('status', [1, 2])->default(1);
             $table->softDeletes();

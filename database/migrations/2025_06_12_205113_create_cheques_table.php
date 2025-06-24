@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cheques', function (Blueprint $table) {
             $table->id();
             $table->foreignId('entreprise_id')->constrained('entreprises', 'id');
+             $table->foreignId('administrateur_id')->nullable()->constrained('administrateurs', 'id');
             $table->foreignId('taxe_entreprise_id')->nullable()->constrained('taxe_entreprises', 'id');  // si id es null c'est un paiement concernant tout
             $table->string('montant')->nullable(); // Montant du paiement
             $table->string('numero_cheque')->nullable(); // Code du paiement

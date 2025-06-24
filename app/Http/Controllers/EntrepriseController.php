@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Logs;
 use App\Models\Entreprise;
 use Illuminate\Http\Request;
 use App\Models\TaxeEntreprise;
-// use App\Imports\EntrepriseImport;
 use App\Imports\EntrepriseImport;
+// use App\Imports\EntrepriseImport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\StoreEntrepriseRequest;
 use App\Http\Requests\UpdateEntrepriseRequest;
@@ -23,6 +25,10 @@ class EntrepriseController extends Controller
     {
         //
         $entreprises = Entreprise::all();
+        // dd($entreprises);
+        $module = "Module Entreprise  ";
+        $action = "A consulter la listes des entreprises";
+        Logs::saveLog($module, $action);
         return view('dashboards.entreprise.index', compact('entreprises'));
     }
 
@@ -82,6 +88,9 @@ class EntrepriseController extends Controller
     // views d'importation de fichier excel
     public function import()
     {
+        $module = "Module Entreprise  ";
+        $action = "A consulter la page importations des fichiers excel pour les entreprises ";
+        Logs::saveLog($module, $action);
         return view('dashboards.entreprise.importe');
     }
 
@@ -159,22 +168,16 @@ class EntrepriseController extends Controller
             foreach ($data[0] as $index => $row) {
 
                 $numLigne = $index + 2;
+                // dd($row);
+                if ($this->ligneEstVide($row)) {
+                    break; // Sort de la boucle si la ligne est vide
+                }
 
                 try {
                     // Conversion des dates si nécessaire (double vérification)
 
-
-                    $dateDepot = $this->parseDate($row['date_de_depot']);
-                    $dateLimite = $this->parseDate($row['date_limite_de_payement']);
-
-                    $nbTaxesNonPayees = $this->convertToInteger($row['nb_de_taxes_deposees_non_payees'] ?? 0);
-                    // $telephone = isset($row['telephone']) ? str_replace(' ', '', $row['telephone']) : null;
-                    // if (!is_int($nbTaxesNonPayees)) {
-                    //     throw new \Exception("Valeur invalide pour 'nb_de_taxes_deposees_non_payees': " . $row['nb_de_taxes_deposees_non_payees']);
-                    // }
-
-                    $telephone = isset($row['telephone']) ? str_replace(' ', '', $row['telephone']) : null;
-
+                    $telephone = isset($row['contact']) ? str_replace(' ', '', $row['contact']) : null;
+                    $montantNettoye = preg_replace('/[^0-9.]/', '', $row['montant_net_a_payer']);
                     // Gestion des numéros multiples séparés par /
                     $telephones = [];
                     if ($telephone && strpos($telephone, '/') !== false) {
@@ -184,66 +187,29 @@ class EntrepriseController extends Controller
                     } else {
                         $telephone2 = null;
                     }
-
-
-
-                    if (!$dateDepot || !$dateLimite) {
-                        throw new \Exception("Format de date invalide pour la ligne " . ($index + 2));
-                    }
-
-                    //  dd($row , $dateDepot, $dateLimite);
-                    // $raison_social = $row['raison_sociale'] ?? null;
-                    // $inspection = $row['inspection'] ?? null;
-                    // verifier si l'entreprise existe déjà
-                    // $existe = Entreprise::where('raison_sociale', $row['raison_sociale'])
-                    //     ->orWhere('secteur_numero_rapport', $row['secteur_n_de_rapport'])
-                    //     ->first();
-                    // if ($existe->exists()) {
-                    //     // Pour cet exemple, nous allons l'ignorer
-                    //     $tab = TaxeEntreprise::where('entreprise_id', $existe->id)
-                    //         ->where('annee', $row['annee'])
-                    //         ->first();
-                    //     if (empty($tab)) {
-                    //         // L'entreprise existe mais pas pour cette année, on peut continuer
-                    //         $taxes = new TaxeEntreprise();
-                    //         $taxes->entreprise_id = $existe->id;
-                    //         $taxes->montant = $row['montant'] ?? null;
-                    //         $taxes->localisation = $row['localisation'] ?? null;
-                    //         $taxes->annee = $row['annee'] ?? null;
-                    //         $taxes->save();
-                    //     }
-
-                    //     continue;
-                    // }
-
                     $existe = Entreprise::where('raison_sociale', $row['raison_sociale'])
-                        ->orWhere('secteur_numero_rapport', $row['secteur_n_de_rapport'])
-                        ->where('telephone',$telephone )
-                        ->where('telephone_2',$telephone2 )
+                        ->where('telephone', $telephone)
+                        ->where('inspection', $row['inspection_de'])
+                        // ->orWhere('telephone_2', $telephone2)
                         ->first();
 
                     if ($existe) {
                         $taxeExistante = TaxeEntreprise::where('entreprise_id', $existe->id)
-                             ->where('semestre_depose', $row['semestre_depose'])
-                             ->where('annee', $row['annee'])
-                             ->where('localisation', $row['localisation'])
-                             ->where('annee_depot_taxe', $row['annee_de_depot_de_la_taxe'])
-                             ->where('date_depot', $dateDepot)
-                             ->where('montant', $row['montant'])
-                            ->where('date_limite_payement', $dateLimite)
+                            ->where('periode', $row['periode'])
+                            ->where('numero_titre_facture', $row['titre_n_n_de_la_facture'])
+                            ->where('localisation', $row['situation_geographique'])
+                            ->where('montant', $montantNettoye)
                             ->first();
-
                         if (empty($taxeExistante)) {
                             TaxeEntreprise::create([
+                                'administrateur_id' => Auth::user()->administrateur->id,
                                 'entreprise_id' => $existe->id,
-                                'montant' => $row['montant'] ?? null,
-                                'localisation' => $row['localisation'] ?? null,
-                                'annee' => $row['annee'] ?? null,
-                                'annee_depot_taxe' => $row['annee_de_depot_de_la_taxe'] ?? null,
-                                'semestre_depose' => $row['semestre_depose'] ?? null,
-                                'date_depot' => $dateDepot ?? null,
-                                'date_limite_payement' => $dateLimite ?? null,
+                                'montant' => $montantNettoye ?? null,
+                                'localisation' => $row['situation_geographique'] ?? null,
+                                'numero_titre_facture' => $row['titre_n_n_de_la_facture'] ?? null,
+                                'periode' => $row['periode'] ?? null,
                                 'status' => 2,
+
                             ]);
                             $compteur++;
                         } else {
@@ -253,39 +219,21 @@ class EntrepriseController extends Controller
                         continue;
                     } else {
 
-
-                        // creation de
-
                         $nouveau = new Entreprise();
+                        $nouveau->administrateur_id =  Auth::user()->administrateur->id;
                         $nouveau->raison_sociale = $row['raison_sociale'];
-                        $nouveau->secteur_numero_rapport = $row['secteur_n_de_rapport'] ?? null;
-                        $nouveau->inspection = $row['inspection'] ?? null;
-                        $nouveau->agent_programme = $row['agent_programme'] ?? null;
-                        $nouveau->numero_ligne = $row['n_ligne'] ?? null;
-                        $nouveau->lieu_de_depot = $row['lieu_de_depot'] ?? null;
+                        $nouveau->inspection = $row['inspection_de'] ?? null;
                         $nouveau->telephone = $telephone ?? null;
                         $nouveau->telephone_2 = $telephone2 ?? null;
-
-
-                        // $nouveau->annee = $row['annee'] ?? null;
-
-                        $nouveau->nb_taxes_deposees = $row['nb_de_taxes_deposees'] ?? null;
-                        $nouveau->nb_taxes_deposees_payees = $row['nb_de_taxes_deposees_payees'] ?? null;
-                        $nouveau->nb_taxes_deposees_non_payees = $nbTaxesNonPayees  ?? null;
                         $nouveau->status = 2;
-                        // $nouveau->montant = $row['montant'] ?? null;
-
                         $nouveau->save();
-
                         TaxeEntreprise::create([
                             'entreprise_id' => $nouveau->id,
-                            'montant' => $row['montant'] ?? null,
-                            'localisation' => $row['localisation'] ?? null,
-                            'annee' => $row['annee'] ?? null,
-                            'annee_depot_taxe' => $row['annee_de_depot_de_la_taxe'] ?? null,
-                            'date_depot' => $dateDepot ?? null,
-                            'date_limite_payement' => $dateLimite ?? null,
-                            'semestre_depose' => $row['semestre_depose'] ?? null,
+                            'administrateur_id' => Auth::user()->administrateur->id,
+                            'periode' => $row['periode'] ?? null,
+                            'numero_titre_facture' => $row['titre_n_n_de_la_facture'] ?? null,
+                            'localisation' => $row['situation_geographique'] ?? null,
+                            'montant' => $montantNettoye ?? null,
                             'status' => 2,
                         ]);
                     }
@@ -295,24 +243,39 @@ class EntrepriseController extends Controller
                     $erreurs[] = "Ligne " . ($index + 2) . ": " . $e->getMessage();
                     Log::error('Erreur lors de l\'importation pour le matricule ' . $e->getMessage());
                     continue;
-
-                    // Log::error('Erreur lors de l\'importation : ' . implode(', ', $erreurs));
                 }
             }
-            // dd($data[0] );
             DB::commit();
-
+            $module = "Module Entreprise  ";
+            $action = "A charger des fichiers excel pour les entreprises ";
+            Logs::saveLog($module, $action);
             return redirect()->route('entreprises.index')
                 ->with('success', "Importation réussie. $compteur enregistrements ajoutés.")
                 ->withErrors($erreurs);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Erreur lors de l\'importation : ' . $e->getMessage());
-            return redirect()->back();
+            $module = "Module Entreprise  ";
+            $action = 'Erreur lors de l\'importation : ' . $e->getMessage();
+            Logs::saveLog($module, $action);
+            $mess = 'Erreur lors de l\'importation : ' . $e->getMessage();
+            $code = 404;
+            return view('dashboards.errors.index', compact('code', 'mess'));
         }
 
 
 
         return back()->with('error', 'Erreur lors de l\'upload.');
+    }
+
+
+    private function ligneEstVide($row)
+    {
+        foreach ($row as $value) {
+            if (!empty($value) && $value !== null && $value !== '') {
+                return false;
+            }
+        }
+        return true;
     }
 }

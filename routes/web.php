@@ -36,6 +36,7 @@ Route::controller(HomeController::class)->group(function () {
     Route::get('/pageSuccessInscription/{codeInscription}', 'pageresultatsInscription')->name('inscriptionVitrine.success');
     Route::get('/creattionAcces/{codeInscription}', 'validationAcces')->name('accessCreat');
 
+
     Route::post('/traitementAccesEntreprise', 'traitAcceEntreprise')->name('traitAccesEntreprise');
     // Route::get('/home', 'index')->name('home');
 
@@ -49,6 +50,11 @@ Route::controller(PaiementInitialController::class)->group(function () {
     Route::post('passagesurlehub','paiementHub')->name('paiementHub');
 });
 
+Route::controller(AdministrateurController::class)->group(function(){
+        Route::get('/creattionAccesAdministrateur/{codeInscription}', 'validationAccesAdmin')->name('accesAdminCreat');
+        Route::post('/traitementAccesAdministrateurC','traitAccesAdministrateur')->name('adminAccesTrait');
+});
+
 
 Route::middleware('auth')->group(function () {
     // les routes du dashboard administrateur et super-administrateur
@@ -60,35 +66,36 @@ Route::middleware('auth')->group(function () {
 
 
         Route::controller(AdministrateurController::class)->group(function (){
+
             Route::get('/listedesAdministrateur','index')->name('administrateur.index');
+            Route::get('/pagedeCreationAdministrateur','create')->name('administrateur.create');
+            Route::post('/traitementEntregistrementAdministrateur','store')->name('administrateur.store');
+
+            Route::get('profilAdministrateur','profilsAdministrateur')->name('profAdmin');
+            Route::post('updateAdministrateurs/{id}','miseaJourInfos')->name('administrateur.update');
+
+            Route::post('modifierMotdePass/{id}','accesMotPasse')->name('posMotPass');
+            Route::post('/desactiveAdministrateur/{id}','desactiveAdmin')->name('desactAdmin');
+            Route::post('/reactiveAdmin/{id}','reactiveAdmin')->name('activAdmin');
+            Route::get('/pageDeMiseAjourAdmin/{id}','edit')->name('administrateur.edit');
+
+            Route::post('traitUpdateInfoAdmin/{id}','modifieAdmin')->name('udpaAdminUser');
         });
 
         Route::controller(EntrepriseController::class)->group(function () {
             Route::get('/entreprises', 'index')->name('entreprises.index');
             Route::get('/entreprises/import', 'import')->name('entreprises.import');
             Route::post('/entreprises/impoter/traitement','traitementImportationExcel')->name('entreprises.traitementImportationExcel');
-            // Route::get('/entreprises/create', 'create')->name('entreprises.create');
-            // Route::post('/entreprises', 'store')->name('entreprises.store');
-            // Route::get('/entreprises/{entreprise}', 'show')->name('entreprises.show');
-            // Route::get('/entreprises/{entreprise}/edit', 'edit')->name('entreprises.edit');
-            // Route::put('/entreprises/{entreprise}', 'update')->name('entreprises.update');
-            // Route::delete('/entreprises/{entreprise}', 'destroy')->name('entreprises.destroy');
+
         });
 
         Route::controller(TaxeEntrepriseController::class)->group(function () {
             Route::get('/entreprises/taxes/{id}', 'listeTaxeEntreprise')->name('entreprises.taxes.index');
-            // Route::get('/entreprises/{id}/taxes/create', 'create')->name('entreprises.taxes.create');
-            // Route::post('/entreprises/{id}/taxes', 'store')->name('entreprises.taxes.store');
-            // Route::get('/entreprises/taxes/{taxeEntreprise}', 'show')->name('entreprises.taxes.show');
-            // Route::get('/entreprises/taxes/{taxeEntreprise}/edit', 'edit')->name('entreprises.taxes.edit');
-            // Route::put('/entreprises/taxes/{taxeEntreprise}', 'update')->name('entreprises.taxes.update');
-            // Route::delete('/entreprises/taxes/{taxeEntreprise}', 'destroy')->name('entreprises.taxes.destroy');
+
         });
 
         Route::controller(PaiementInitialController::class)->group(function () {
             Route::get('/entreprises/paiements', 'index')->name('entreprises.paiements.index');
-            // Route::get('/entreprises/paiements/{id}', 'show')->name('entreprises.paiements.show');
-            // Route::post('/entreprises/paiements/traitement', 'traitementPaiement')->name('entreprises.paiements.traitement');
         });
 
         Route::controller(ChequeController::class)->group(function(){
@@ -109,9 +116,6 @@ Route::middleware('auth')->group(function () {
 
 
             Route::get('/listesdePaiementEffectuel/{id}', 'mesrecus')->name('espaceClient.mesrecus');
-            // Route::get('/espace-client/entreprise', 'entreprise')->name('espaceClient.entreprise');
-            // Route::get('/espace-client/taxes', 'taxes')->name('espaceClient.taxes');
-            // Route::get('/espace-client/factures', 'factures')->name('espaceClient.factures');
         });
     });
 

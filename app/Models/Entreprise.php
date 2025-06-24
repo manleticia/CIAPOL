@@ -5,6 +5,7 @@ use App\Models\User;
 use App\Models\Cheque;
 use App\Models\Inscrit;
 use App\Models\Paiement;
+use App\Models\Administrateur;
 use App\Models\TaxeEntreprise;
 use App\Models\PaiementInitial;
 use Illuminate\Database\Eloquent\Model;
@@ -42,5 +43,9 @@ class Entreprise extends Model
       public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+        public function administrateur(): BelongsTo
+    {
+        return $this->belongsTo(Administrateur::class);
     }
 }

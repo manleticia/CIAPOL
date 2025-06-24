@@ -19,8 +19,8 @@ class AdministrateurSeeder extends Seeder
          $user = User::create([
             'name' => "Super Admin",
             "contact" => "0707070707",
-            "email" => "admin@gmail.com",
-            "password" => Hash::make('12345678')
+            "email" => "admin01@gmail.com",
+            "password" => Hash::make('MENDOS012024')
         ]);
 
         // assign role
@@ -33,6 +33,7 @@ class AdministrateurSeeder extends Seeder
             "contact" => "0707070707",
             "email" => $user->email,
             "genre" => "Homme",
+            "id_parains" => 0, // uniquement l'id du dev
             "adresse" => "Abidjan, Cocody Riviera Palmeraie",
         ]);
     }

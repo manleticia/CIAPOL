@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enregistrement Réussi | Paiement par Chèque</title>
-     <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon"> 
+     <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -329,21 +329,23 @@
                     <i class="fas fa-check-circle"></i>
                 </div>
                 <h1>Enregistrement Réussi !</h1>
-                <p>Votre chèque a été enregistré avec succès sur notre plateforme CIAPOL</p>
+                <p>Votre {{ $cheque->NaturePaiement ?? "chèque" }}  a été enregistré avec succès sur notre plateforme CIAPOL</p>
             </div>
 
             <div class="success-body">
                 <div class="receipt" id="printableArea">
                     <h3><i class="fas fa-receipt"></i> Reçu d'enregistrement</h3>
-
+                    @php
+                        // dd($cheque);
+                    @endphp
                     <div class="amount-display">
-                        <div class="label">Montant du chèque</div>
+                        <div class="label">MONTANT DU {{ $cheque->NaturePaiement ?? "chèque" }}</div>
                         <div class="value">{{ number_format($cheque->montant, 0, ',', ' ') }} FCFA</div>
                     </div>
 
                     <div class="receipt-details">
                         <div class="detail-item">
-                            <div class="detail-label">Numéro du chèque</div>
+                            <div class="detail-label">Numéro du <span style="text-transform: lowercase;">{{ $cheque->NaturePaiement ?? "chèque" }}</span></div>
                             <div class="detail-value">{{ $cheque->numero_cheque }}</div>
                         </div>
 
@@ -358,15 +360,17 @@
                             <div class="detail-label">Date d'émission</div>
                             <div class="detail-value">{{ date('d/m/Y', strtotime($cheque->date_emission)) }}</div>
                         </div>
-
+                        {{-- @php
+                            dd($cheque);
+                        @endphp --}}
                         <div class="detail-item">
-                            <div class="detail-label">Référence transaction</div>
-                            <div class="detail-value">CHQ-{{ strtoupper(uniqid()) }}</div>
+                            <div class="detail-label">Nom du titulaire du compte</div>
+                            <div class="detail-value">{{ $cheque->titulaire ?? "xxxxxxxxx" }}</div>
                         </div>
 
                         <div class="detail-item">
                             <div class="detail-label">Date d'enregistrement</div>
-                            <div class="detail-value">{{ date('d/m/Y H:i') }}</div>
+                            <div class="detail-value">{{  date('d/m/Y H:i',strtotime($cheque->created_at) ) }}</div>
                         </div>
 
                         <div class="detail-item">
@@ -392,8 +396,8 @@
                     <div class="step">
                         <span class="step-number">2</span>
                         <div class="step-content">
-                            <strong>Envoyez votre chèque</strong>
-                            <p>Adressez votre chèque accompagné de ce reçu à notre service financier :</p>
+                            <strong>Envoyez votre <span style="text-transform: lowercase;">{{ $cheque->NaturePaiement ?? "chèque" }}</span></strong>
+                            <p>Adressez votre <span style="text-transform: lowercase;">{{ $cheque->NaturePaiement ?? "chèque" }}</span> accompagné de ce reçu à notre service financier :</p>
                             <p style="margin-top: 0.5rem; font-style: italic;">
                                 Service Comptabilité - Plateforme<br>
                               Angre 7eme tranche, Abidjan Cocody<br>
@@ -406,7 +410,7 @@
                         <span class="step-number">3</span>
                         <div class="step-content">
                             <strong>Confirmation finale</strong>
-                            <p>Vous recevrez une notification par email lorsque le chèque sera encaissé et votre compte
+                            <p>Vous recevrez une notification par email lorsque le <span style="text-transform: lowercase;">{{ $cheque->NaturePaiement ?? "chèque" }}</span> sera encaissé et votre compte
                                 crédité (délai de 48h ouvrées).</p>
                         </div>
                     </div>

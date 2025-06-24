@@ -31,8 +31,10 @@
                     <div class="dropdown morphing scale-left">
                         <a href="#" class="card-fullscreen" data-bs-toggle="tooltip" title="Card Full-Screen"><i
                                 class="icon-size-fullscreen"></i></a>
-                        <a href="#" class="btn btn-primary d-inline">Ajouter un
-                            administrateur</a>
+                        @if ($ver->id_parains == 0 || $ver->id_parains == 1)
+                            <a href="{{ route('administrateur.create') }}" class="btn btn-primary d-inline">Ajouter un
+                                administrateur</a>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -46,8 +48,11 @@
                                     <th>Email</th>
                                     <th>Adresse</th>
                                     <th>genre</th>
+                                    <th>Profil</th>
                                     <th>Statut</th>
-                                    <th>Actions</th>
+                                    @if ($ver->id_parains == 0 || $ver->id_parains == 1)
+                                        <th>Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,27 +74,47 @@
                                         <td>{{ $index + 1 }}</td>
                                         <td>
                                             <img src="{{ $imgUrl }}" class="avatar sm rounded me-2"
-                                                alt="profile-image">
+                                                alt="profile-image"> <br>
                                             <span>{{ $administrateur->nom }} {{ $administrateur->prenom }}</span>
                                         </td>
-                                        <td>{{ $administrateur->email }}</td>
                                         <td>{{ $administrateur->contact ?? '-' }}</td>
+                                        <td>{{ $administrateur->email }}</td>
                                         {{-- <td>{{ $administrateur->ville->libelle }}</td> --}}
                                         <td>{{ $administrateur->adresse }}</td>
                                         <td>{{ $administrateur->genre }}</td>
+                                        <td>
+                                            @if ($administrateur->profil == 'administrateur')
+                                                Administrateur CIAPOL
+                                            @else
+                                                Administrateur BMI-WFS
+                                            @endif
+                                        </td>
                                         {{-- <td>{!! $isOnline !!}</td> --}}
                                         <td>{!! $statusBadge !!}</td>
-                                        <td>
-                                            {{-- <a href="{{ route('administrateurs.show',$administrateur->id) }}" id="ShowAdmin" class="btn btn-link btn-sm text-success infoIcon" data-bs-toggle="tooltip" data-bs-toggle="modal" data-bs-target="#info_admin" data-bs-placement="top" title="Infos"><i class="fa fa-eye"></i></a> --}}
-                                            <a href="#" id="EditAdmin"
-                                                class="btn btn-link btn-sm text-primary editIcon"
-                                                data-bs-target="#edit_admin" title="Modifier"><i
-                                                    class="fa fa-pencil"></i></a>
-                                            <a href="#deleteModal{{ $administrateur->id }}" id="DeleteAdministrateur"
-                                                class="btn btn-link btn-sm text-danger deleteIcon" data-bs-toggle="modal"
-                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Supprimer"><i
-                                                    class="fa fa-trash"></i></a>
-                                        </td>
+                                        @if ($ver->id_parains == 0 || $ver->id_parains == 1)
+                                            <td>
+                                                @if ($administrateur->status == 2)
+                                                    <a href="#deleteModal{{ $administrateur->id }}" id="RestaurerActualite"
+                                                        class="btn btn-link btn-sm text-danger refreshIcon"
+                                                        data-bs-toggle="modal" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" title="Restaurer"><i
+                                                            class="fa fa-refresh"></i></a>
+                                                @else
+                                                    <a href="{{ route('administrateur.edit', $administrateur->id) }}"
+                                                        id="EditAdmin" class="btn btn-link btn-sm text-primary editIcon"
+                                                        data-bs-target="#edit_admin" title="Modifier"><i
+                                                            class="fa fa-pencil"></i></a>
+                                                    <a href="#deleteModal{{ $administrateur->id }}"
+                                                        id="DeleteAdministrateur"
+                                                        class="btn btn-link btn-sm text-danger deleteIcon"
+                                                        data-bs-toggle="modal" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top" title="Supprimer"><i
+                                                            class="fa fa-trash"></i></a>
+                                                @endif
+                                                {{-- <a href="{{ route('administrateurs.show',$administrateur->id) }}" id="ShowAdmin" class="btn btn-link btn-sm text-success infoIcon" data-bs-toggle="tooltip" data-bs-toggle="modal" data-bs-target="#info_admin" data-bs-placement="top" title="Infos"><i class="fa fa-eye"></i></a> --}}
+
+                                            </td>
+                                        @endif
                                     </tr>
 
                                     <!-- Modal delete-->
@@ -103,32 +128,59 @@
                                                         style="width:90px;height:90px">
                                                     </lord-icon>
                                                     <div class="mt-4 text-center">
-                                                        <h4>Vous êtes sur le point de supprimer <br>un administrateur ?</h4>
-                                                        <p class="text-muted fs-15 mb-4">En supprimant cet administrateur,
-                                                            vous supprimez
-                                                            <br> toutes les informations le concernant de notre base de
-                                                            données.
-                                                        </p>
+
+                                                        @if ($administrateur->status == 2)
+                                                            <h4>Vous êtes sur le point de restaurer <br>un administrateur ?
+                                                            </h4>
+                                                            <p class="text-muted fs-15 mb-4">En restaurant cet
+                                                                administrateur, vous
+                                                                ramener
+                                                                <br> toutes les informations la concernant de notre base de
+                                                                données.
+                                                            </p>
+                                                        @else
+                                                            <h4>Vous êtes sur le point de supprimer <br>un administrateur ?
+                                                            </h4>
+                                                            <p class="text-muted fs-15 mb-4">En supprimant cet
+                                                                administrateur,
+                                                                vous supprimez
+                                                                <br> toutes les informations le concernant de notre base de
+                                                                données.
+                                                            </p>
+                                                        @endif
                                                         <div class="hstack gap-2 justify-content-center remove">
                                                             <button
                                                                 class="btn btn-link link-success fw-medium text-decoration-none"
                                                                 id="deleteRecord-close" data-bs-dismiss="modal"><i
                                                                     class="ri-close-line me-1 align-middle"></i>
                                                                 Fermer</button>
-
-                                                            <form method="POST" action="#">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                {{-- <input name="_method" type="hidden" value="DELETE"> --}}
-                                                                <button class="btn btn-danger" id="delete-record">Oui,
-                                                                    supprimer</button>
-                                                            </form>
+                                                            @if ($administrateur->status == 2)
+                                                                <form method="POST"
+                                                                    action="{{ route('activAdmin', $administrateur->id) }}">
+                                                                    @method('POST')
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-danger"
+                                                                        id="delete-record">Oui,
+                                                                        restaurer</button>
+                                                                </form>
+                                                            @else
+                                                                <form method="POST"
+                                                                    action="{{ route('desactAdmin', $administrateur->id) }}">
+                                                                    @csrf
+                                                                    @method('POST')
+                                                                    <button class="btn btn-danger" id="delete-record">Oui,
+                                                                        supprimer</button>
+                                                                </form>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+
+
                                     <!--end modal -->
                                 @endforeach
                             </tbody>

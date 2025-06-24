@@ -11,7 +11,7 @@ class StoreAdministrateurRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,33 @@ class StoreAdministrateurRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            //7
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'genre' => 'required|in:Homme,Femme',
+            'profil' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'adresse' => 'required|string|max:255',
+            'contact' => 'required|string|max:20',
+            'lien_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ];
+    }
+    public function messages()
+    {
+        return [
+            'nom.required' => 'Le nom est obligatoire.',
+            'prenom.required' => 'Le prénom est obligatoire.',
+            'genre.required' => 'Le genre est obligatoire.',
+            'genre.in' => 'Le genre doit être Homme ou Femme.',
+            'profil.required' => 'Le profil est requis.',
+            'email.required' => 'L\'email est obligatoire.',
+            'email.email' => 'L\'adresse email doit être valide.',
+            'email.unique' => 'Cet email est déjà utilisé.',
+            'adresse.required' => 'L\'adresse est obligatoire.',
+            'contact.required' => 'Le contact est obligatoire.',
+            'lien_photo.image' => 'Le fichier doit être une image.',
+            'lien_photo.mimes' => 'Seules les images JPG, JPEG et PNG sont autorisées.',
+            'lien_photo.max' => 'L\'image ne doit pas dépasser 2 Mo.',
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 use App\Models\Cheque;
 use App\Models\Paiement;
 use App\Models\Entreprise;
+use App\Models\Administrateur;
 use App\Models\PaiementInitial;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -32,5 +33,9 @@ class TaxeEntreprise extends Model
         public function cheques(): HasOne
     {
         return $this->hasOne(Cheque::class);
+    }
+          public function administrateur(): BelongsTo
+    {
+        return $this->belongsTo(Administrateur::class);
     }
 }

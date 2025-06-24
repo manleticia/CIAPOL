@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logs;
 use App\Models\Entreprise;
 use App\Models\TaxeEntreprise;
 use App\Http\Requests\StoreTaxeEntrepriseRequest;
@@ -71,7 +72,10 @@ class TaxeEntrepriseController extends Controller
     {
         $taxes = TaxeEntreprise::where('entreprise_id', $id)->get();
         $libelle = Entreprise::find($id)->raison_sociale;
-        // dd($taxes ,$libelle);clez
+        // dd($taxes ,$libelle);
+        $module = " Module Taxe Entreprise";
+        $action =  "A consulter la liste des taxes entreprises";
+        Logs::saveLog($module, $action);
         return view('dashboards.entreprise.taxes.index', compact('taxes', 'libelle'));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Logs;
 use App\Models\Cheque;
 use App\Models\Paiement;
 use Illuminate\Http\Request;
@@ -21,6 +22,9 @@ class EspaceClientController extends Controller
             ->where('status', 2) // a change apres
             ->sum('montant');
         // dd($us, $valeurs, $sommeMontants);
+        $module = "Module Espace Clients  ";
+        $action = "A consulter l'espace Client  ";
+        Logs::saveLog($module, $action);
         return view('espaceClient.index', compact('us', 'valeurs', 'sommeMontants'));
     }
 
@@ -33,13 +37,16 @@ class EspaceClientController extends Controller
             $valeur = TaxeEntreprise::findOrFail($id);
             $montant = $valeur->montant;
             // dd($valeur);
-            $libelle ='Paiement du : '. $valeur->semestre_depose;
+            $libelle = 'Paiement du : ' . $valeur->semestre_depose;
         } else {
             $montant = $request->montant;
             $valeur = [];
             $libelle = 'Paiement de tout les factures de l\'entreprise';
         }
-        return view('espaceClient.cheques.index', compact('us', 'valeur','montant','libelle'));
+        $module = "Module Espace Clients  ";
+        $action = "A consulter la page d'enregistrement de cheque ou virement   ";
+        Logs::saveLog($module, $action);
+        return view('espaceClient.cheques.index', compact('us', 'valeur', 'montant', 'libelle'));
     }
 
     public function chequEnregistre(Request $request)
@@ -69,6 +76,9 @@ class EspaceClientController extends Controller
         $cheque->status = 2; // En attente
         $cheque->save();
         // Redirection avec un message de succès
+        $module = "Module Espace Clients  ";
+        $action = "A enregistrer un cheque ou virement  ";
+        Logs::saveLog($module, $action);
         return redirect()->route('succesCheque', $cheque->id)->with('success', 'Chèque enregistré avec succès.');
     }
 
@@ -76,6 +86,9 @@ class EspaceClientController extends Controller
     {
         $cheque = Cheque::findOrFail($id);
         // dd($cheque);
+        $module = "Module Espace Clients  ";
+        $action = "A consulter la page de succes pour l'enregistrement d'un cheque ou virement  ";
+        Logs::saveLog($module, $action);
         return view('espaceClient.cheques.succes', compact('cheque'));
         // return redirect()->route('espaceClient.index')->with('success', 'Chèque enregistré avec succès.');
     }
@@ -85,10 +98,13 @@ class EspaceClientController extends Controller
         $paiements = PaiementInitial::where('entreprise_id', $id)
             // ->where('status', 1) // Paiements réussis
             // ->get();
-             ->paginate(10);
-        $cheques = Cheque::where('entreprise_id',$id)
-                           ->paginate(10);
+            ->paginate(10);
+        $cheques = Cheque::where('entreprise_id', $id)
+            ->paginate(10);
         // dd($cheques);
-        return view('espaceClient.recupaiements', compact('paiements','cheques'));
+        $module = "Module Espace Clients  ";
+        $action = "A consulter la page de transation des paiements  ";
+        Logs::saveLog($module, $action);
+        return view('espaceClient.recupaiements', compact('paiements', 'cheques'));
     }
 }

@@ -52,7 +52,7 @@
                                         <div class="mb-3">
                                             <h6>Libelle</h6>
                                             <p class="fs-5">
-                                                {{ $cheque->taxeEntreprise->semestre_depose ?? 'Non renseigné' }}</p>
+                                                {{ $cheque->taxeEntreprise->periode ?? 'Non renseigné' }}</p>
                                         </div>
                                         <div class="mb-3">
                                             <h6>Localisation</h6>
@@ -112,17 +112,17 @@
                                             <h6>Téléphone</h6>
                                             <p class="fs-5">
                                                 <a href="tel:{{ $cheque->entreprise->telephone }}" class="text-primary">
-                                                    {{ $cheque->entreprise->telephone }}
+                                                    {{ $cheque->entreprise->telephone }} @if( !empty($cheque->entreprise->telephone2) )/{{  $cheque->entreprise->telephone2 }} @endif
                                                 </a>
                                             </p>
                                         </div>
 
                                         <div class="mb-3">
-                                            <h6>Numero Secteur</h6>
+                                            <h6>INSPECTION DE : </h6>
                                             <p class="fs-5">
-                                                <a href="mailto:{{ $cheque->entreprise->secteur_numero_rapport }}"
+                                                <a
                                                     class="text-primary">
-                                                    {{ $cheque->entreprise->secteur_numero_rapport ?? 'Non renseigné' }}
+                                                    {{ $cheque->entreprise->inspection ?? 'Non renseigné' }}
                                                 </a>
                                             </p>
                                         </div>

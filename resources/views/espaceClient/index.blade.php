@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Profil - Paiement Factures</title>
-     <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon"> 
+     <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Reset et styles de base */
@@ -600,35 +600,38 @@
                     <div class="facture-item">
                         <strong>Service:</strong> paiement de facture
                     </div>
-                    <div class="facture-item">
+                    {{-- <div class="facture-item">
                         <strong>Agent Programme:</strong> {{ $us->agent_programme ?? '' }}
-                    </div>
+                    </div> --}}
 
                 </div>
             </div>
             @foreach ($valeurs as $value)
+            @php
+                // dd($value);
+            @endphp
                 <div class="factures-container">
-                    <h2><i class="fas fa-file-invoice"></i> {{ $value->semestre_depose }} </h2>
+                    <h2><i class="fas fa-file-invoice"></i> {{ $value->periode ?? "xxxxxxxx" }} </h2>
 
                     <div class="facture-card">
                         <div class="facture-header">
                             <div class="row jsustify-content-between align-items-center">
                                 <div class="col-6">
-                                    <h3><strong>date limite pour payement : {{ $value->date_limite_payement }}
+                                    <h3><strong>NUMERO TITRE FACTURE : {{ $value->numero_titre_facture ?? "xxxxxxx" }}
                                         </strong>
                                     </h3>
                                 </div>
                                 <div class="col-6">
                                     <h3>
-                                        <strong>Adresse:</strong> {{ $value->localisation }}
+                                        <strong>LOCALISATION:</strong> {{ $value->localisation ?? "xxxxxxx" }}
                                     </h3>
                                 </div>
-                                <div class="col-6">
+                                {{-- <div class="col-6">
                                     <h3>
 
                                         <strong> Date depot taxe :</strong>{{ $value->annee_depot_taxe }}
                                     </h3>
-                                </div>
+                                </div> --}}
                             </div>
 
 
@@ -637,15 +640,15 @@
                         <div class="facture-details">
 
                             <div class="facture-item">
-                                <span><strong> {{ $value->semestre_depose }}</strong></span>
-                                <span> <strong> {{ $value->montant }} FCFA </strong></span>
+                                <span><strong> {{ $value->periode  ?? "xxxxxx" }}</strong></span>
+                                <span> <strong> {{ $value->montant ?? "xxxxxx" }} FCFA </strong></span>
                             </div>
 
                         </div>
 
                         <div class="facture-actions">
                             <div class="facture-total ">
-                                <div class="row ">
+                                <div class="row">
                                     <div class="col-6">
                                         {{-- <a href="" class="btn pay-btn">
                                             <i class="fas fa-eye"></i> Detail
@@ -679,7 +682,8 @@
                         <h2><i class="fas fa-credit-card"></i> Paiement de Facture</h2>
 
                         <div style="margin: 20px 0; padding: 15px; background-color: #ecfdf5; border-radius: 8px;">
-                            <p><strong>Facture : {{ $value->semestre_depose }} </strong></p>
+                            <p><strong>Facture : {{ $value->periode ?? "xxxxxx" }} </strong></p>
+                            <p><strong>N° titre facture : {{ $value->numero_titre_facture ?? "xxxxxx" }} </strong></p>
                             <p>Montant à payer: <strong> {{ $value->montant }} Fcfa</strong></p>
 
 
@@ -692,10 +696,8 @@
                                 <div class="payment-buttons">
                                     <!-- Bouton Paiement par chèque -->
                                     <form action="{{ route('espaceClient.cheques') }}" method="post">
-                                        {{-- {{ route('payment.cheque', $value->id) }} --}}
                                         @csrf
                                         @method('POST')
-                                        <!-- Champ caché pour le montant -->
                                         <input type="text" name="idtaxe" value="{{ $value->id }}" hidden>
 
                                         <input type="text" name="montant" value="{{ $value->montant }}" hidden>
@@ -717,11 +719,8 @@
                                         class="payment-btn mobile-btn">
                                         @csrf
                                         @method('POST')
-                                        <!-- Champ caché pour le montant -->
                                         <input type="text" name="montant" value="{{ $value->montant }}" hidden>
                                         <input type="text" name="idtaxe" value="{{ $value->id }}" hidden>
-
-                                        <!-- Bouton Paiement via le hubb -->
                                         <button type="submit" class="payment-btn mobile-btn">
                                             <div class="btn-icon">
                                                 <i class="fas fa-mobile-alt"></i>
@@ -773,7 +772,7 @@
             <h2><i class="fas fa-credit-card"></i> Paiement de Facture</h2>
 
             <div style="margin: 20px 0; padding: 15px; background-color: #ecfdf5; border-radius: 8px;">
-                <p><strong>Facture de </strong></p>
+                <p><strong>Facture de Tout mes Taxes </strong></p>
                 <p>Montant à payer: <strong> {{ $sommeMontants }} Fcfa</strong></p>
 
             </div>

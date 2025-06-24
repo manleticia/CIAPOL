@@ -57,7 +57,7 @@
                                     <tr>
                                         <td>{{ $ind + 1 }}</td>
                                         <td>{{ $cheque->entreprise->raison_sociale ?? 'xxxxxxxxx' }}</td>
-                                        <td>{{ $cheque->taxeEntreprise->semestre_depose ?? 'TOUT' }}</td>
+                                        <td>{{ $cheque->taxeEntreprise->periode ?? 'TOUT' }}</td>
                                         <td>{{ $cheque->NaturePaiement ?? "xxxxxxx" }}</td>
                                         <td>{{ $cheque->numero_cheque ?? "xxxxxxxxx" }}
                                         </td>

@@ -40,13 +40,11 @@
                             <thead>
                                 <tr>
                                     <th>N</th>
-                                    <th>Libelle</th>
-                                    <th>Annee</th>
+                                    <th>Periode</th>
+                                    <th>Titre Facture</th>
                                     <th>Localisation</th>
-                                    <th>Année de depot taxe</th>
-                                    <th>Année de depot</th>
-                                    <th>date limite Payement</th>
                                     <th>Montant</th>
+
                                     <th>Statut</th>
                                     {{-- <th>Actions</th> --}}
                                 </tr>
@@ -54,14 +52,16 @@
                             <tbody>
                                 @foreach ($taxes as $ind => $entreprise)
                                     <tr>
+                                        @php
+                                            // dd($entreprise)
+                                        @endphp
                                         <td>{{ $ind + 1 }}</td>
-                                        <td>{{ $entreprise->semestre_depose ?? "xxxxxxx" }}</td>
-                                        <td>{{ $entreprise->annee }}</td>
+                                        <td>{{ $entreprise->periode ?? "xxxxxxx" }}</td>
+                                        <td>{{ $entreprise->numero_titre_facture ?? "xxxxxxx" }}</td>
                                         <td>{{ $entreprise->localisation }}</td>
-                                        <td>{{ $entreprise->annee_depot_taxe }}</td>
-                                        <td>{{ $entreprise->date_depot }}</td>
-                                        <td>{{ $entreprise->date_limite_payement }}</td>
                                         <td> {{ number_format($entreprise->montant, 0, ',', ' ') }} FCFA</td>
+
+
                                         <td>
                                             <span class="badge bg-{{ $entreprise->status == 1 ? 'success' : 'danger' }}">
                                                 {{ $entreprise->status == 1 ? 'Payer' : 'Impayer' }}

@@ -129,19 +129,7 @@
                     </span>
                 </div>
             </div>
-            <div class="row pb-2">
-                <div class="col-7">
-                    <strong>
-                        Agent programme: <br>
 
-                    </strong>
-                </div>
-                <div class="col-5">
-                    <span class="text-center  text-uppercase">
-                        <b> {{ $infos->agent_programme ?? 'XXXXXXXXXXX' }}</b>
-                    </span>
-                </div>
-            </div>
 
             <div class="row pb-2">
                 <div class="col-7">
@@ -252,9 +240,9 @@
             <p>------------------------------------------------------------------------------------------</p>
         </center>
         <p class="text-center">
-            ce reçu atteste que la somme mentionnée ci-dessus a été reçue en
-            @if ($paiement->entité)
-                <b> {{ $paiement->entité ?? 'XXXXXXXXXXX' }}</b>
+            ce reçu atteste que la somme mentionnée ci-dessus a été reçue pour
+            @if ($paiement->taxeEntreprise->periode)
+                <b>   <br> la facture {{ $paiement->taxeEntreprise->periode ?? 'Total' }}</b>
             @endif
 
         </p>

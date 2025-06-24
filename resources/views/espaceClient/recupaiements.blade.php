@@ -97,6 +97,7 @@
             color: #991b1b;
         }
 
+        /*
         .pagination {
             display: flex;
             justify-content: center;
@@ -120,6 +121,60 @@
 
         .pagination a:hover:not(.active) {
             background-color: #ddd;
+        } */
+
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            padding: 15px 0;
+        }
+
+        .pagination-links {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .page-link,
+        .pagination span:not(.active) {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            color: #003153;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background-color: #f0f0f0;
+        }
+
+        .pagination .active {
+            padding: 8px 15px;
+            background-color: #003153;
+            color: white;
+            border-radius: 5px;
+            border: 1px solid #003153;
+        }
+
+        .pagination .disabled {
+            padding: 8px 15px;
+            color: #999;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+
+            .page-link,
+            .pagination span {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
         }
 
         .action-buttons {
@@ -158,7 +213,7 @@
             color: #6b7280;
         }
 
-        @media (max-width: 768px) {
+        /* @media (max-width: 768px) {
 
             th,
             td {
@@ -169,7 +224,7 @@
                 flex-direction: column;
                 gap: 15px;
             }
-        }
+        } */
     </style>
 </head>
 
@@ -202,7 +257,7 @@
                                     <th>Date</th>
                                     <th>Montant</th>
                                     <th>Méthode</th>
-                                    <th>Facture</th>
+                                    {{-- <th>Facture</th> --}}
                                     <th>Statut</th>
                                     <th>Actions</th>
                                 </tr>
@@ -210,11 +265,14 @@
                             <tbody>
                                 @foreach ($paiements as $paiement)
                                     <tr>
-                                         <td>
+                                        {{-- @php
+                                            dd($paiement);
+                                        @endphp --}}
+                                        <td>
                                             @if (!empty($paiement->taxe_entreprise_id))
-                                                {{ $paiement->taxeEntreprise->semestre_depose ?? 'xxxxxxxx' }}
+                                                {{ $paiement->taxeEntreprise->periode ?? 'xxxxxxxx' }}
                                             @else
-                                               Tout les Factures
+                                                Tout les Factures
                                             @endif
                                         </td>
                                         <td>{{ $paiement->referencePaiement ?? ($paiement->codePaiement ?? 'xxxxxx') }}
@@ -223,13 +281,15 @@
                                         </td>
                                         <td>{{ number_format($paiement->montant, 0, ',', ' ') }} FCFA</td>
                                         <td>
-                                            @if ($paiement->moyenPaiement == 'cheque')
+                                            @if ($paiement->moyenPaiement == 'CHEQUE')
                                                 <i class="fas fa-money-check-alt"></i> Chèque
+                                            @elseif ($paiement->moyenPaiement == 'VIREMENT')
+                                                <i class="fas fa-money-check-alt"></i> VIREMENT
                                             @else
                                                 <i class="fas fa-mobile-alt"></i> Mobile
                                             @endif
                                         </td>
-                                        <td>{{ $paiement->taxeEntreprise->semestre_depose ?? 'N/A' }}</td>
+                                        {{-- <td>{{ $paiement->taxeEntreprise->numero_titre_facture ?? 'N/A' }}</td> --}}
                                         <td>
                                             @if ($paiement->status == 1)
                                                 <span class="badge badge-success">
@@ -259,8 +319,69 @@
                         </table>
                     </div>
 
+                    {{-- <div class="pagination">
+                        @if ($paiements->hasPages())
+                            <div class="pagination-links">
+                                @if ($paiements->onFirstPage())
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">&laquo; Précédent</span>
+                                    </span>
+                                @else
+                                    <a href="{{ $paiements->previousPageUrl() }}" class="page-link"
+                                        rel="prev">&laquo; Précédent</a>
+                                @endif
+                                @foreach ($paiements->getUrlRange(1, $paiements->lastPage()) as $page => $url)
+                                    @if ($page == $paiements->currentPage())
+                                        <span class="active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+                                @if ($paiements->hasMorePages())
+                                    <a href="{{ $paiements->nextPageUrl() }}" class="page-link" rel="next">Suivant
+                                        &raquo;</a>
+                                @else
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">Suivant &raquo;</span>
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
+                    </div> --}}
                     <div class="pagination">
-                        {{ $paiements->links() }}
+                        @if ($paiements->hasPages())
+                            <div class="pagination-links">
+                                {{-- Previous Page Link --}}
+                                @if ($paiements->onFirstPage())
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">&laquo; Précédent</span>
+                                    </span>
+                                @else
+                                    <a href="{{ $paiements->url($paiements->currentPage() - 1) }}&cheques_page={{ $cheques->currentPage() }}"
+                                        class="page-link" rel="prev">&laquo; Précédent</a>
+                                @endif
+
+                                {{-- Pagination Elements --}}
+                                @foreach ($paiements->getUrlRange(1, $paiements->lastPage()) as $page => $url)
+                                    @if ($page == $paiements->currentPage())
+                                        <span class="active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}&cheques_page={{ $cheques->currentPage() }}"
+                                            class="page-link">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                {{-- Next Page Link --}}
+                                @if ($paiements->hasMorePages())
+                                    <a href="{{ $paiements->url($paiements->currentPage() + 1) }}&cheques_page={{ $cheques->currentPage() }}"
+                                        class="page-link" rel="next">Suivant &raquo;</a>
+                                @else
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">Suivant &raquo;</span>
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @else
                     <div class="no-data">
@@ -303,9 +424,9 @@
                                     <tr>
                                         <td>
                                             @if (!empty($cheque->taxe_entreprise_id))
-                                                {{ $cheque->taxeEntreprise->semestre_depose ?? 'xxxxxxxx' }}
+                                                {{ $cheque->taxeEntreprise->periode ?? 'xxxxxxxx' }}
                                             @else
-                                               Tout les Factures
+                                                Tout les Factures
                                             @endif
                                         </td>
                                         <td>
@@ -365,8 +486,65 @@
                         </table>
                     </div>
 
+                    {{-- <div class="pagination">
+                        @if ($cheques->hasPages())
+                            <div class="pagination-links">
+                                @if ($cheques->onFirstPage())
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">&laquo; Précédent</span>
+                                    </span>
+                                @else
+                                    <a href="{{ $cheques->previousPageUrl() }}" class="page-link"
+                                        rel="prev">&laquo; Précédent</a>
+                                @endif
+                                @foreach ($cheques->getUrlRange(1, $cheques->lastPage()) as $page => $url)
+                                    @if ($page == $cheques->currentPage())
+                                        <span class="active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+                                @if ($cheques->hasMorePages())
+                                    <a href="{{ $cheques->nextPageUrl() }}" class="page-link" rel="next">Suivant
+                                        &raquo;</a>
+                                @else
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">Suivant &raquo;</span>
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
+                    </div> --}}
+
                     <div class="pagination">
-                        {{ $paiements->links() }}
+                        @if ($cheques->hasPages())
+                            <div class="pagination-links">
+                                @if ($cheques->onFirstPage())
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">&laquo; Précédent</span>
+                                    </span>
+                                @else
+                                    <a href="?paiements_page={{ $paiements->currentPage() }}&cheques_page={{ $cheques->currentPage() - 1 }}"
+                                        class="page-link" rel="prev">&laquo; Précédent</a>
+                                @endif
+                                @foreach ($cheques->getUrlRange(1, $cheques->lastPage()) as $page => $url)
+                                    @if ($page == $cheques->currentPage())
+                                        <span class="active">{{ $page }}</span>
+                                    @else
+                                        <a href="?paiements_page={{ $paiements->currentPage() }}&cheques_page={{ $page }}"
+                                            class="page-link">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+                                @if ($cheques->hasMorePages())
+                                    <a href="?paiements_page={{ $paiements->currentPage() }}&cheques_page={{ $cheques->currentPage() + 1 }}"
+                                        class="page-link" rel="next">Suivant &raquo;</a>
+                                @else
+                                    <span class="disabled" aria-disabled="true">
+                                        <span class="page-link">Suivant &raquo;</span>
+                                    </span>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @else
                     <div class="no-data">

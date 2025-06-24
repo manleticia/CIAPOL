@@ -43,23 +43,23 @@ class EntrepriseImport implements ToCollection, WithBatchInserts, WithChunkReadi
         //     ]);
         // }
 
-        return $rows->map(function ($row) {
-            // Conversion des dates Excel
-            if (isset($row['date_de_depot']) && is_numeric($row['date_de_depot'])) {
-                $row['date_de_depot'] = $this->excelToDateTime($row['date_de_depot']);
-            }
+        // return $rows->map(function ($row) {
+        //     // Conversion des dates Excel
+        //     if (isset($row['date_de_depot']) && is_numeric($row['date_de_depot'])) {
+        //         $row['date_de_depot'] = $this->excelToDateTime($row['date_de_depot']);
+        //     }
 
-            if (isset($row['date_limite_de_payement']) && is_numeric($row['date_limite_de_payement'])) {
-                $row['date_limite_de_payement'] = $this->excelToDateTime($row['date_limite_de_payement']);
-            }
+        //     if (isset($row['date_limite_de_payement']) && is_numeric($row['date_limite_de_payement'])) {
+        //         $row['date_limite_de_payement'] = $this->excelToDateTime($row['date_limite_de_payement']);
+        //     }
 
 
-            $row['nb_taxes_deposees'] = $this->cleanNumber($row['nb_taxes_deposees'] ?? 0);
-            $row['nb_taxes_deposees_payees'] = $this->cleanNumber($row['nb_taxes_deposees_payees'] ?? 0);
-            $row['nb_taxes_deposees_non_payees'] = $this->cleanNumber($row['nb_taxes_deposees_non_payees'] ?? 0);
+        //     $row['nb_taxes_deposees'] = $this->cleanNumber($row['nb_taxes_deposees'] ?? 0);
+        //     $row['nb_taxes_deposees_payees'] = $this->cleanNumber($row['nb_taxes_deposees_payees'] ?? 0);
+        //     $row['nb_taxes_deposees_non_payees'] = $this->cleanNumber($row['nb_taxes_deposees_non_payees'] ?? 0);
 
-            return $row;
-        });
+        //     return $row;
+        // });
     }
 
     public function rules(): array

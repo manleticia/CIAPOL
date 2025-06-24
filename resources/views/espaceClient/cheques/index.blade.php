@@ -407,7 +407,7 @@
                             <option value="SGBCI">Société Générale Côte d'Ivoire (SGBCI)</option>
                             <option value="BICICI">BICICI</option>
                             <option value="SIB">Société Ivoirienne de Banque (SIB)</option>
-                            <option value="OTHER">Autre banque</option>
+                            <option value="AUTRE">Autre banque</option>
                         </select>
                     </div>
 
@@ -488,7 +488,7 @@
             const autreBanqueContainer = document.getElementById('autre-banque-container');
 
             banqueSelect.addEventListener('change', function() {
-                if (this.value === 'OTHER') {
+                if (this.value === 'AUTRE') {
                     autreBanqueContainer.style.display = 'block';
                     document.getElementById('autre-banque').required = true;
                 } else {

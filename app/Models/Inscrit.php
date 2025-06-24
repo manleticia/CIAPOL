@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Entreprise;
+use App\Models\Administrateur;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,5 +18,9 @@ class Inscrit extends Model
       public function entreprise(): BelongsTo
     {
         return $this->belongsTo(Entreprise::class);
+    }
+         public function administrateur(): BelongsTo
+    {
+        return $this->belongsTo(Administrateur::class);
     }
 }
