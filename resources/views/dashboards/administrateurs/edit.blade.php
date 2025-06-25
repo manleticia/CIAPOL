@@ -118,21 +118,23 @@
                     </div>
                     <div class="col-lg-3 col-md-12">
                         <div class="form-floating">
-                            <select class="form-select form-control @error('profil') is-invalid @enderror" id="profil"
-                                name="profil" autocomplete="profil" required>
+                         <select class="form-select form-control @error('profil') is-invalid @enderror"
+        id="profil" name="profil" autocomplete="profil" required>
 
-                                <option value="">Sélectionnez le profil</option>
+    <option value="">Sélectionnez le profil</option>
 
-                                <option value="administrateur"
-                                    {{ old('profil', $administrateur->user->hasRole('administrateur') ? 'administrateur' : '') == 'administrateur' ? 'selected' : '' }}>
-                                    Administrateur CIAPOL
-                                </option>
+    <option value="administrateur"
+        {{ old('profil', $administrateur->profil) == 'administrateur' ? 'selected' : '' }}>
+        Administrateur CIAPOL
+    </option>
 
-                                <option value="superAdministrateur"
-                                    {{ old('profil', $administrateur->user->hasRole('super-administrateur') ? 'superAdministrateur' : '') == 'superAdministrateur' ? 'selected' : '' }}>
-                                    Administrateur BMI-WFS
-                                </option>
-                            </select>
+    <option value="superAdministrateur"
+        {{ old('profil', $administrateur->profil) == 'superAdministrateur' ? 'selected' : '' }}>
+        Administrateur BMI-WFS
+    </option>
+
+</select>
+
 
                             @error('profil')
                                 <span class="invalid-feedback" role="alert">

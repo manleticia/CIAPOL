@@ -271,6 +271,7 @@ class AdministrateurController extends Controller
                 'email' => $request->email,
                 'genre' => $request->genre,
                 'adresse' => $request->adresse,
+                'profil' => $request->profil,
                 'lien_photo' => $lien_photo ?? $administrateur->lien_photo,
             ]);
             $module = "Module Administrateur ";
