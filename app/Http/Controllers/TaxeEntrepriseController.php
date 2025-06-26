@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Logs;
 use App\Models\Entreprise;
 use App\Models\TaxeEntreprise;
+
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaxeEntrepriseRequest;
 use App\Http\Requests\UpdateTaxeEntrepriseRequest;
 

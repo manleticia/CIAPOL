@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Models\TaxeEntreprise;
 use App\Models\PaiementInitial;
 
+use App\Http\Controllers\Controller;
+
 class EspaceClientController extends Controller
 {
     //

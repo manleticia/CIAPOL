@@ -9,6 +9,8 @@ use App\Models\TaxeEntreprise;
 use App\Models\PaiementInitial;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\StorePaiementInitialRequest;
 use App\Http\Requests\UpdatePaiementInitialRequest;

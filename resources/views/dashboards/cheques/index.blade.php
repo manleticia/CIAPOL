@@ -28,11 +28,11 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title m-0">Liste des paiements</h6>
-                    {{-- <div>
-                        <a href="{{ route('entreprises.import') }}" class="btn btn-success">
-                            <i class="fas fa-file-import me-2"></i>Importer
+                    <div>
+                        <a href="{{ route('cheque.create') }}" class="btn btn-success">
+                            <i class="fas fa-file-import me-2"></i>Enregistre un chéque ou virement
                         </a>
-                    </div> --}}
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

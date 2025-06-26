@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/detailCheques/{id}','show')->name('detail.cheques');
             Route::post('/validationdeCheque/{id}','confirmeCheque')->name('validcheque');
             Route::post('/refuserCheques/{id}','refuseCheque')->name('refusCheque');
+            Route::get('/pageEnregistrementCheque/virement','create')->name('cheque.create');
         });
     });
 

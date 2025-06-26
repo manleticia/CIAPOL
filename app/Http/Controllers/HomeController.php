@@ -8,9 +8,11 @@ use App\Models\Inscrit;
 use App\Models\Entreprise;
 use Illuminate\Http\Request;
 use App\Models\Administrateur;
+
 use App\Models\PaiementInitial;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;

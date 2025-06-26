@@ -11,11 +11,13 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
 use App\Http\Requests\StoreAdministrateurRequest;
+
 use App\Http\Requests\UpdateAdministrateurRequest;
 
 class AdministrateurController extends Controller

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Logs;
+
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreLogsRequest;
 use App\Http\Requests\UpdateLogsRequest;
 

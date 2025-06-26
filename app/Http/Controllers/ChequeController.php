@@ -12,10 +12,12 @@ use App\Models\TaxeEntreprise;
 use App\Models\PaiementInitial;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
 use App\Http\Requests\StoreChequeRequest;
+
 use App\Http\Requests\UpdateChequeRequest;
 
 class ChequeController extends Controller
@@ -28,7 +30,7 @@ class ChequeController extends Controller
         //7
         $cheques = Cheque::all();
         $module = "Module Cheque ";
-        $action = "A  consulter la liste des cheques";
+        $action = "A  consulter la liste des cheques ou Virements";
         Logs::saveLog($module, $action);
         return view('dashboards.cheques.index', compact('cheques'));
     }
@@ -39,6 +41,12 @@ class ChequeController extends Controller
     public function create()
     {
         //
+        $entreprises = Entreprise::All();
+        // dd($entreprises);
+        $module = "Module Cheque ";
+        $action = "A  consulter la page enregistrement des cheques ou virements ";
+        Logs::saveLog($module, $action);
+        return view('dashboards.cheques.create',compact('entreprises'));
     }
 
     /**

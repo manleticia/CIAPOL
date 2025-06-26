@@ -11,7 +11,9 @@ use App\Imports\EntrepriseImport;
 // use App\Imports\EntrepriseImport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\StoreEntrepriseRequest;
 use App\Http\Requests\UpdateEntrepriseRequest;

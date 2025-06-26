@@ -8,6 +8,8 @@ use App\Models\Entreprise;
 use Illuminate\Http\Request;
 use App\Models\PaiementInitial;
 
+use App\Http\Controllers\Controller;
+
 class DashboardController extends Controller
 {
     //
