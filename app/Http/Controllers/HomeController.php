@@ -9,6 +9,7 @@ use App\Models\Entreprise;
 use Illuminate\Http\Request;
 use App\Models\Administrateur;
 
+use App\Models\TaxeEntreprise;
 use App\Models\PaiementInitial;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -346,5 +347,30 @@ class HomeController extends Controller
         $action = "A consulter le recu d'un paiement   ";
         Logs::saveLog($module, $action);
         return view('vitrines.recu', compact('infos', 'paiement'));
+    }
+
+
+
+      // api qui recuperer la lists des taxEntreprise en fonction de l'entreprise selectionne
+    public function lisEntreTaxeId($id)
+    {
+        $taxes = TaxeEntreprise::where('entreprise_id', $id)
+                                ->where('status',2)
+                                ->get();
+
+
+        if (empty($taxes)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucune taxe trouvée pour cette entreprise.',
+                'data' => [],
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Taxes récupérées avec succès.',
+            'data' => $taxes,
+        ]);
     }
 }

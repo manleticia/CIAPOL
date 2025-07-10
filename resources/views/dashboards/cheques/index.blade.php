@@ -30,7 +30,7 @@
                     <h6 class="card-title m-0">Liste des paiements</h6>
                     <div>
                         <a href="{{ route('cheque.create') }}" class="btn btn-success">
-                            <i class="fas fa-file-import me-2"></i>Enregistre un chéque ou virement
+                            <i class="fas fa-file-import me-2"></i>Enregistre un chéque ou virement 
                         </a>
                     </div>
                 </div>

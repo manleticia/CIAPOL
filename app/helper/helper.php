@@ -101,8 +101,8 @@ function genererMotDePasse($longueur = 10)
 
 function urlSite()
 {
-    $exe = 'LOCAL';
     $exe = 'REEL';
+    $exe = 'LOCAL';
     if ($exe == 'REEL') {
         return "https://www.mafacture.ciapol-ci.com/";
     } else {
@@ -129,4 +129,11 @@ function getIp()
         $ip = $_SERVER['REMOTE_ADDR'];
     }
     return $ip;
+}
+
+
+function extraireMontantEntier($montantAvecDevise)
+{
+    $montantNet = preg_replace('/[^0-9.]/', '', $montantAvecDevise);
+    return (int) floatval($montantNet);
 }

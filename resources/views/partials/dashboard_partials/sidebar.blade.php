@@ -323,7 +323,7 @@
                           </li>
                           <li>
                               <a class="m-link
-                              @if (in_array(Route::currentRouteName(), ['listCheques', 'detail.cheques'])) active @endif
+                              @if (in_array(Route::currentRouteName(), ['listCheques', 'detail.cheques' ,'cheque.create'])) active @endif
              "
                                   href="{{ route('listCheques') }}">
 

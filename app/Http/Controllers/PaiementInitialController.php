@@ -129,8 +129,11 @@ class PaiementInitialController extends Controller
                 'pay_fees' => 1,
                 // 'Url_Retour' => route('faclication_paiment_reussi',['codePaiement'=>$codePaiement]),
                 // 'Url_Callback' => route('paiement_retour'),
+
                 'Url_Retour' => 'https://127.0.0.1:8000/retourPaiementResultat/' . $codePaiement,
                 'Url_Callback' => 'https://127.0.0.1:8000/api/Callback',
+                // 'Url_Retour' => 'https://www.mafacture.ciapol-ci.com/retourPaiementResultat/' . $codePaiement,
+                // 'Url_Callback' => 'https://www.mafacture.ciapol-ci.com/api/Callback',
             ];
             // dd($data);
             $reponse = Http::withHeaders(['MerchantId' => MerchantId(), 'ApiKey' => ApiKey()])
@@ -159,6 +162,7 @@ class PaiementInitialController extends Controller
                 }
             }
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()->with('error', 'Erreur lors de la génération du code de paiement : ' . $e->getMessage());
             $module = "Module Paiement  ";
             $mess = 'Erreur lors de la génération du code de paiement : ' . $e->getMessage();
@@ -195,10 +199,6 @@ class PaiementInitialController extends Controller
     }
 
 
-
-
-
-
     /// api callback
     public function callbackFunction(Request $request)
     {
@@ -211,7 +211,7 @@ class PaiementInitialController extends Controller
             (string) $codePaiement = $request->codePaiement;
 
             // Recupère le paiement en attente avec le statut '2'
-            $paiementinit = PaiementInitial::where('code_paiement', $codePaiement)
+            $paiementinit = PaiementInitial::where('codePaiement', $codePaiement)
                 ->where('status', 2)
                 ->first();
 
@@ -264,7 +264,7 @@ class PaiementInitialController extends Controller
                 }
                 $paiementinit->save();
 
-                $module =" Module Paiement";
+                $module = " Module Paiement";
                 $action = 'a Effectuer un paiement succes sur le hub : ';
                 Logs::saveLog($module, $action);
             } else {
@@ -274,8 +274,8 @@ class PaiementInitialController extends Controller
                 // $log->contenu = $Chaine;
                 // $log->titre = "Log callback paiement";
                 // $log->save();
-                 $module =" Module Paiement";
-                $action =  $Chaine ;
+                $module = " Module Paiement";
+                $action =  $Chaine;
                 Logs::saveLog($module, $action);
             }
         } catch (\Throwable $e) {
@@ -285,9 +285,9 @@ class PaiementInitialController extends Controller
             //     $log->contenu = $Chaine;
             //     $log->titre = "Log callback paiement";
             //     $log->save();
-                      $module =" Module Paiement";
-                $action =  $Chaine ;
-                Logs::saveLog($module, $action);
+            $module = " Module Paiement";
+            $action =  $Chaine;
+            Logs::saveLog($module, $action);
         }
 
         return 'Ok';

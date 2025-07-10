@@ -43,6 +43,9 @@ Route::controller(HomeController::class)->group(function () {
     //retour paiement
     Route::get('/retourPaiementResultat/{codePaiement}','retourPaiement');
     Route::get('/voirRecuPaiement/{codePaiement}','recuPaiement')->name('recuPay');
+
+
+    Route::get('/listeTaxeApi/{id}','lisEntreTaxeId');
 });
 
 // route des paiements
@@ -103,7 +106,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/detailCheques/{id}','show')->name('detail.cheques');
             Route::post('/validationdeCheque/{id}','confirmeCheque')->name('validcheque');
             Route::post('/refuserCheques/{id}','refuseCheque')->name('refusCheque');
+            // ajouter dans la view
             Route::get('/pageEnregistrementCheque/virement','create')->name('cheque.create');
+            Route::post('/enregistremCheOuVir','store')->name('cheque.store');
         });
     });
 

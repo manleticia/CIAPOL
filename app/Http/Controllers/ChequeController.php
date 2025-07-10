@@ -46,7 +46,7 @@ class ChequeController extends Controller
         $module = "Module Cheque ";
         $action = "A  consulter la page enregistrement des cheques ou virements ";
         Logs::saveLog($module, $action);
-        return view('dashboards.cheques.create',compact('entreprises'));
+        return view('dashboards.cheques.create', compact('entreprises'));
     }
 
     /**
@@ -55,6 +55,46 @@ class ChequeController extends Controller
     public function store(StoreChequeRequest $request)
     {
         //
+        // dd($request->all());
+        try {
+            DB::beginTransaction();
+            $idTaxe = '';
+            if ($request->taxe_entreprise == '00') {
+                $idTaxe = null;
+            } else {
+                $idTaxe = $request->taxe_entreprise;
+            }
+            $montant = extraireMontantEntier($request->montant);
+            $idAdmin = Auth::user()->administrateur->id;
+
+            $cheque = new Cheque();
+            $cheque->entreprise_id = $request->entreprise_id;
+            $cheque->taxe_entreprise_id = $idTaxe ?? null; // Si idtaxe est vide, on le met à null
+            $cheque->montant = $montant;
+            $cheque->numero_cheque = $request->numero_cheque;
+            $cheque->banque = $request->banque;
+            $cheque->autre_banque = $request->autre_banque ?? null; // Si autre_banque est vide, on le met à null
+            $cheque->date_emission = $request->date_emission;
+            $cheque->titulaire = $request->titulaire;
+            $cheque->NaturePaiement = $request->NaturePaiement;
+            $cheque->notes = $request->notes ?? null; // Si notes est vide, on le met à null
+            $cheque->status = 2; // En attente
+            $cheque->save();
+            $module = "Module Cheque ";
+            $action = "l'administrateur avec l'id : $idAdmin viens d'enregistre un $request->NaturePaiement  ayant l'identifiant :$cheque->id";
+            Logs::saveLog($module, $action);
+            DB::commit();
+            return redirect()->route('listCheques')->with('success', ' Virement ou Chéque  enregistre  avec succès');
+            //code...
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error("Erreur lors de l'enregistrement du chèque ou virement : " . $e->getMessage());
+            $module = "Module Cheque  ";
+            $action = "Erreur lors de l'enregistrement  du chèque ou virement  : " . $e->getMessage();
+            Logs::saveLog($module, $action);
+            return redirect()->back()
+                ->with('error', 'Une erreur est survenue lors de l\'enregistrement du chèque ou virement: ' . $e->getMessage());
+        }
     }
 
     /**
