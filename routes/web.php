@@ -56,6 +56,9 @@ Route::controller(PaiementInitialController::class)->group(function () {
 Route::controller(AdministrateurController::class)->group(function(){
         Route::get('/creattionAccesAdministrateur/{codeInscription}', 'validationAccesAdmin')->name('accesAdminCreat');
         Route::post('/traitementAccesAdministrateurC','traitAccesAdministrateur')->name('adminAccesTrait');
+
+        Route::get('/creattionAccesAdministrateur/{codeInscription}', 'validationAccesRein')->name('reinitaccesAdmin');
+        Route::post('/traitementAccesAdministrateurRein/{id}','reinPassWord')->name('storUpdaAccesAdmin');
 });
 
 
@@ -83,6 +86,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/pageDeMiseAjourAdmin/{id}','edit')->name('administrateur.edit');
 
             Route::post('traitUpdateInfoAdmin/{id}','modifieAdmin')->name('udpaAdminUser');
+
+            // route pour la réinitialisation du mot de passe
+            Route::post('/reinitialisationMotDePasse/{id}', 'reinitialiserMotDePasse')->name('reinitMotPass');
         });
 
         Route::controller(EntrepriseController::class)->group(function () {

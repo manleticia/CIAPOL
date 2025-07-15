@@ -204,40 +204,7 @@ class AdministrateurController extends Controller
         return view('dashboards.administrateurs.edit', compact('title', 'administrateur'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    // public function update(UpdateAdministrateurRequest $request, Administrateur $administrateur)
-    // {
-    //     //
-    //     // dd($request->all());
-    //     try {
-    //         // dd($request->all());
-    //         DB::beginTransaction();
-    //         // assigner un role
-    //         $lien_photo = null;
 
-    //         // Vérifier si le fichier a été téléchargé
-    //         if ($request->hasFile('lien_photo')) {
-    //             $file_name = Carbon::now()->timestamp . '.' . $request->lien_photo->extension();
-    //             $request->lien_photo->storeAs('images-administrateurs/', $file_name);
-    //             $lien_photo = 'src-files/images-administrateurs/' . $file_name;
-    //         }
-    //         $administrateur->nom = $request->nom;
-    //         $administrateur->prenom = $request->prenom;
-    //         $administrateur->contact = $request->contact;
-    //         $administrateur->email = $request->email;
-    //         $administrateur->genre = $request->genre;
-    //         $administrateur->adresse = $request->adresse;
-    //         $administrateur->lien_photo = $lien_photo ?? $administrateur->lien_photo;
-    //         $administrateur->save();
-    //         DB::commit();
-    //         return redirect()->route('profAdmin')->with('success', 'Administrateur Ajouter avec Success');
-    //     } catch (\Throwable $th) {
-    //         //throw $th;
-    //         DB::rollback();
-    //     }
-    // }
 
     public function update(UpdateAdministrateurRequest $request,  $id) {}
     public function modifieAdmin(UpdateAdministrateurRequest $request,  $id)
@@ -592,6 +559,149 @@ class AdministrateurController extends Controller
             ];
             Logs::saveLog($module, $action . ' - ' . json_encode($message));
             return back()->with('error', 'Une erreur technique est survenue. Veuillez réessayer.');
+        }
+    }
+
+
+
+    // reinitialiser mot de passe
+    public function reinitialiserMotDePasse(Request $request, $id)
+    {
+        // dd($request->all(),$id);
+        try {
+            DB::beginTransaction();
+            $administrateur = Administrateur::findOrFail($id);
+            // dd($administrateur , $administrateur->user->email);
+            $codeInscription = $this->generateCodeInscrptionAdmin();
+            $administrateur->codeLiens = $codeInscription;
+            $administrateur->save();
+            // Envoi de l'email avec le nouveau mot de passe
+            $lienDeValidation = URL::signedRoute(
+                'reinitaccesAdmin',
+                ['codeInscription' => $administrateur->codeLiens]
+            );
+            $nom_plateforme = "CIAPOL FACTURE";
+            $sujet = "Réinitialisation de votre mot de passe administrateur";
+            $message = "
+                        <p>Bonjour " . $administrateur->prenom . " " . $administrateur->nom . ",</p>
+
+                        <p>Votre compte administrateur a été réinitialisé avec succès.</p>
+
+                        <p>Pour définir un <strong>nouveau mot de passe</strong> et accéder à votre espace administrateur, veuillez cliquer sur le bouton ci-dessous :</p>
+
+                        <div style='text-align:center; margin:25px 0;'>
+                            <a href='" . $lienDeValidation . "' style='background-color:#007bff; color:white; padding:12px 30px; text-decoration:none; border-radius:5px; font-weight:bold; font-size:16px;'>
+                                DÉFINIR MON NOUVEAU MOT DE PASSE
+                            </a>
+                        </div>
+
+                        <p><strong>Informations importantes :</strong></p>
+                        <ul>
+                            <li>Ce lien est <strong>valable pendant 48 heures</strong> uniquement.</li>
+                            <li>Après ce délai, vous devrez demander une nouvelle réinitialisation.</li>
+                            <li>Pour des raisons de sécurité, veillez à choisir un mot de passe fort et à ne pas le partager.</li>
+                        </ul>
+
+                        <p>Si vous n'avez pas demandé cette réinitialisation, veuillez ignorer cet e-mail ou contacter notre équipe de support immédiatement.</p>
+
+                        <p>Pour toute assistance, vous pouvez nous écrire à l’adresse suivante :
+                            <a href='mailto:infos@bmi.ci'>infos@bmi.ci</a>
+                        </p>
+                    ";
+            $url = appelApiEmail();
+            $template = View::make('email.index', ['contenumess' => $message])->render();
+            $data = [
+                'provider' => 'CIAPOL <info@mail-taseti.com>',
+                "key_rsa" => 're_2i7H3Ynf_KRVm9VwTsrwrfF8isCBYvyyE',
+                "destination" => $administrateur->email ?? $administrateur->user->email,
+                "sujet" => $sujet,
+                "message" => $template
+            ];
+            $retourAPI = Http::post($url, $data);
+            $res = $retourAPI->json();
+
+            if ($retourAPI->status() == 200) {
+                (int)$code = $res['status'];
+                if ($code != 200) {
+                    $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
+                    // Log::ajoutLOG($message);
+                    $module = "Envoyer de Mail a la reinitialisation mot de passe administrateur ";
+                    $action = "Echec d'envoyer de mail  : $message";
+                    Logs::saveLog($module, $action);
+                    $mess = $message;
+                    return view('dashboards.errors.index', compact('code', 'mess'));
+                } else {
+                    DB::commit();
+                    $module = "Envoyer de Mail a la reinitialisation mot de passe administrateur";
+                    $action = "Email envoyer avec success   : $administrateur->nom , $administrateur->prenom sur son email  $administrateur->email";
+                    Logs::saveLog($module, $action);
+                    return redirect()->route('administrateur.index')->with('success', 'Mot de passe réinitialisé avec succès. Un email a été envoyé à l\'administrateur avec les nouveaux identifiants.');
+                }
+            } else {
+                Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
+                $module = "Module Administrateur ";
+                $action = "Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status();
+                $mess = "Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status();
+                Logs::saveLog($module, $action);
+                $code = 404;
+                return view('dashboards.errors.index', compact('code', 'mess'));
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Erreur lors de la réinitialisation du mot de passe de l\'administrateur : ' . $e->getMessage());
+            $module = "Module Administrateur ";
+            $action = 'Erreur lors de la réinitialisation du mot de passe de l\'administrateur : ' . $e->getMessage();
+            Logs::saveLog($module, $action);
+            $mess = 'Erreur lors de la réinitialisation du mot de passe de l\'administrateur : ' . $e->getMessage();
+            $code = 404;
+            return view('dashboards.errors.index', compact('code', 'mess'));
+        }
+    }
+
+    //
+    public function validationAccesRein($codeInscription)
+    {
+        $administrateur = Administrateur::where('codeLiens', $codeInscription)->first();
+        // dd($administrateur);
+        if (empty($administrateur)) {
+            $module = "Module Administrateur ";
+            $action = "Code de reinitialisation  acces  invalide ou expiré. pour la reinitialisation d'un compte administrateur : code entrer : $codeInscription ";
+            Logs::saveLog($module, $action);
+            return redirect()->route('acceuil')->with('error', 'Code de reinitialisation  acces  invalide ou expiré.');
+        }
+        return view('dashboards.administrateurs.modifAcces', compact('administrateur'));
+    }
+    public function reinPassWord(Request $request, $id)
+    {
+        // dd($request->all(), $id);
+        try {
+            DB::beginTransaction();
+            $request->validate([
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $administrateur = Administrateur::findOrFail($id);
+            $user = $administrateur->user;
+            if ($request->password && $request->password == $request->password_confirmation) {
+                $user->password = Hash::make($request->password);
+            }
+            $user->save();
+            $administrateur->codeLiens = null; // ou un autre code si nécessaire
+            $administrateur->save();
+            DB::commit();
+            $module = "Module Administrateur ";
+            $action = "A reinitialiser le mot de passe de l'administrateur id = $id: ";
+            Logs::saveLog($module, $action);
+            return redirect()->route('pageConnexion')->with('success', 'Mot de passe réinitialisé avec succès. Veuillez vous connecter.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Erreur lors de la réinitialisation du mot de passe de l\'administrateur : ' . $e->getMessage());
+            $module = "Module Administrateur ";
+            $action = 'Erreur lors de la réinitialisation du mot de passe de l\'administrateur : ' . $e->getMessage();
+            Logs::saveLog($module, $action);
+            $mess = 'Erreur lors de la réinitialisation du mot de passe de l\'administrateur : ' . $e->getMessage();
+            $code = 404;
+            return view('dashboards.errors.index', compact('code', 'mess'));
         }
     }
 }

@@ -351,15 +351,14 @@ class HomeController extends Controller
 
 
 
-      // api qui recuperer la lists des taxEntreprise en fonction de l'entreprise selectionne
+    // api qui recuperer la lists des taxEntreprise en fonction de l'entreprise selectionne
     public function lisEntreTaxeId($id)
     {
         $taxes = TaxeEntreprise::where('entreprise_id', $id)
-                                ->where('status',2)
-                                ->get();
+            ->where('status', 2)
+            ->get();
 
-
-        if (empty($taxes)) {
+        if ($taxes->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Aucune taxe trouvée pour cette entreprise.',
@@ -371,6 +370,6 @@ class HomeController extends Controller
             'success' => true,
             'message' => 'Taxes récupérées avec succès.',
             'data' => $taxes,
-        ]);
+        ], 200); 
     }
 }
