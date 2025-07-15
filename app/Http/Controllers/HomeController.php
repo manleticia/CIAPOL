@@ -348,28 +348,40 @@ class HomeController extends Controller
         Logs::saveLog($module, $action);
         return view('vitrines.recu', compact('infos', 'paiement'));
     }
-
-
-
     // api qui recuperer la lists des taxEntreprise en fonction de l'entreprise selectionne
     public function lisEntreTaxeId($id)
     {
-        $taxes = TaxeEntreprise::where('entreprise_id', $id)
-            ->where('status', 2)
-            ->get();
 
-        if ($taxes->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Aucune taxe trouvée pour cette entreprise.',
-                'data' => [],
-            ], 404);
+        try {
+
+            $result["data"] = [];
+
+            if (!is_numeric($id)) {
+                $result["status"] = 400;
+                $result["message"] = "données entreprise invalide";
+                return $result;
+            }
+            $taxes = TaxeEntreprise::select(['id', 'periode', 'montant'])
+                ->where('entreprise_id', $id)
+                ->where('status', 2)
+                ->get();
+
+            if (count($taxes)>0) {
+                $result["status"] = 200;
+                $result["message"] = "succes";
+                $result["data"] = $taxes;
+                return $result;
+            } else {
+                $result["status"] = 404;
+                $result["message"] = 'Aucune taxe trouvée pour cette entreprise.';
+                return $result;
+            }
+
+        } catch (\Throwable $th) {
+            $result["status"] = 500;
+            $result["message"] = 'Une erreur inattendue s\'est produite. ERR: ' . $th->getMessage();
+            return $result;
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Taxes récupérées avec succès.',
-            'data' => $taxes,
-        ], 200); 
     }
 }

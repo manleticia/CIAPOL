@@ -85,6 +85,7 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    <small id="feedback" class="text-danger mt-0"></small>
                                     @error('entreprise_id')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -274,349 +275,6 @@
 @push('js')
     <script src="{{ asset('assets/select2/select2.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    {{-- <script>
-        let taxesData = {};
-        $(document).ready(function() {
-            // Initialisation des select2
-            $('.select2').select2({
-                placeholder: "Sélectionnez une option",
-                allowClear: true
-            });
-
-            // Gestion du changement d'entreprise
-            $("#entreprise_id").on('change', function() {
-                let identreprise = $(this).val();
-                let taxeSelect = $('#taxe_entreprise');
-
-                // Réinitialiser le montant
-                $('#montant').val('0.00 FCFA');
-
-                if (identreprise > 0) {
-                    let url = $("#lienUrl").val().replace(":id", identreprise);
-
-                    // Afficher un indicateur de chargement
-                    taxeSelect.empty().append('<option value="0">Chargement en cours...</option>')
-                        .prop('disabled', true);
-
-                    getlisteTaxeEntreprise(url);
-                } else {
-                    taxeSelect.empty().append(
-                            '<option value="">Sélectionnez d\'abord une entreprise</option>')
-                        .prop('disabled', false);
-                }
-            });
-
-            // Gestion de la sélection de la taxe
-            $('#taxe_entreprise').on('change', function() {
-                let selectedTaxId = $(this).val();
-
-                if (selectedTaxId && taxesData[selectedTaxId]) {
-                    $('#montant').val(taxesData[selectedTaxId].montant.toFixed(2) + ' FCFA');
-                } else {
-                    $('#montant').val('0.00 FCFA');
-                }
-            });
-
-            // Chargement initial si une entreprise est déjà sélectionnée
-            if ($("#entreprise_id").val() > 0) {
-                let url = $("#lienUrl").val().replace(":id", $("#entreprise_id").val());
-                getlisteTaxeEntreprise(url);
-            }
-        });
-
-        function getlisteTaxeEntreprise(url) {
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                beforeSend: function() {
-                    $('#taxe_entreprise').prop('disabled', true);
-                },
-                success: function(response) {
-                    let taxeSelect = $('#taxe_entreprise');
-                    taxeSelect.empty();
-                    taxesData = {}; // Réinitialiser les données
-
-                    // Ajouter les options par défaut
-                    taxeSelect.append('<option value="0">Sélectionner la taxe</option>');
-                    taxeSelect.append('<option value="00">Payer toutes les taxes</option>');
-
-                    if (response.data && response.data.length > 0) {
-                        // Stocker les données des taxes et calculer le total
-                        let totalMontant = 0;
-                        response.data.forEach(function(taxe) {
-                            taxesData[taxe.id] = {
-                                periode: taxe.periode,
-                                montant: parseFloat(taxe.montant) || 0
-                            };
-                            totalMontant += taxesData[taxe.id].montant;
-                        });
-
-                        // Stocker le total dans taxesData
-                        taxesData['00'] = {
-                            periode: "Toutes les taxes",
-                            montant: totalMontant
-                        };
-
-                        // Ajouter les options au select
-                        $.each(taxesData, function(id, taxe) {
-                            if (id !==
-                                '00') { // On ajoute pas '00' car déjà ajouté comme option par défaut
-                                taxeSelect.append(new Option(
-                                    `${taxe.periode} - ${taxe.montant.toFixed(2)} FCFA`,
-                                    id,
-                                    false,
-                                    false
-                                ));
-                            }
-                        });
-
-                        // Sélectionner l'ancienne valeur si elle existe
-                        let oldTax = @json(old('taxe_entreprise', ''));
-                        if (oldTax) {
-                            taxeSelect.val(oldTax).trigger('change');
-                        } else {
-                            // Sélectionner l'option par défaut
-                            taxeSelect.val('0').trigger('change');
-                        }
-                    } else {
-                        taxeSelect.append('<option value="">Aucune taxe disponible</option>');
-                    }
-
-                    // Réactiver le select
-                    taxeSelect.prop('disabled', false);
-                },
-                error: function(xhr, status, error) {
-                    console.error("Erreur AJAX:", error);
-                    $('#taxe_entreprise')
-                        .empty()
-                        .append('<option value="0">Sélectionner la taxe</option>')
-                        .append('<option value="00">Payer toutes les taxes</option>')
-                        .append('<option value="">Erreur de chargement</option>')
-                        .prop('disabled', false);
-                    $('#montant').val('0.00 FCFA');
-
-                    toastr.error('Erreur lors du chargement des taxes', 'Erreur');
-                }
-            });
-        }
-        $('#taxe_entreprise').on('change', function() {
-            let selectedTaxId = $(this).val();
-
-            if (selectedTaxId === '00' && taxesData['00']) {
-                // Cas "Payer toutes les taxes"
-                $('#montant').val(taxesData['00'].montant.toFixed(2) + ' FCFA');
-            } else if (selectedTaxId && taxesData[selectedTaxId]) {
-                // Cas d'une taxe spécifique
-                $('#montant').val(taxesData[selectedTaxId].montant.toFixed(2) + ' FCFA');
-            } else {
-                // Cas par défaut
-                $('#montant').val('0.00 FCFA');
-            }
-        });
-    </script> --}}
-
-
-    <script>
-        (function() {
-            // Configuration globale
-            const config = {
-                currency: ' FCFA',
-                defaultAmount: '0.00',
-                defaultTaxeSelectOptions: [{
-                        value: '0',
-                        text: 'Sélectionner la taxe'
-                    },
-                    {
-                        value: '00',
-                        text: 'Payer toutes les taxes'
-                    }
-                ],
-                errorMessages: {
-                    loadError: 'Erreur lors du chargement des taxes',
-                    noTaxes: 'Aucune taxe disponible'
-                }
-            };
-
-            // État de l'application
-            const state = {
-                taxesData: {},
-                selectedEntreprise: null
-            };
-
-            // Initialisation
-            $(document).ready(function() {
-                initSelect2();
-                bindEvents();
-                loadInitialData();
-            });
-
-            function initSelect2() {
-                $('.select2').select2({
-                    placeholder: "Sélectionnez une option",
-                    allowClear: true,
-                    width: '100%'
-                });
-            }
-
-            function bindEvents() {
-                $("#entreprise_id").on('change', handleEntrepriseChange);
-                $('#taxe_entreprise').on('change', handleTaxeChange);
-            }
-
-            function loadInitialData() {
-                const entrepriseId = $("#entreprise_id").val();
-                if (entrepriseId > 0) {
-                    state.selectedEntreprise = entrepriseId;
-                    const url = $("#lienUrl").val().replace(":id", entrepriseId);
-                    loadTaxes(url);
-                }
-            }
-
-            function handleEntrepriseChange() {
-                const entrepriseId = $(this).val();
-                state.selectedEntreprise = entrepriseId;
-                const taxeSelect = $('#taxe_entreprise');
-
-                resetMontantField();
-
-                if (entrepriseId > 0) {
-                    const url = $("#lienUrl").val().replace(":id", entrepriseId);
-                    showLoadingState(taxeSelect);
-                    loadTaxes(url);
-                } else {
-                    resetTaxeSelect(taxeSelect);
-                }
-            }
-
-            function handleTaxeChange() {
-                const selectedTaxId = $(this).val();
-                updateMontantField(selectedTaxId);
-            }
-
-            function resetMontantField() {
-                $('#montant').val(config.defaultAmount + config.currency);
-            }
-
-            function showLoadingState(selectElement) {
-                selectElement.empty()
-                    .append('<option value="0">Chargement en cours...</option>')
-                    .prop('disabled', true)
-                    .trigger('change');
-            }
-
-            function resetTaxeSelect(selectElement) {
-                selectElement.empty()
-                    .append('<option value="">Sélectionnez d\'abord une entreprise</option>')
-                    .prop('disabled', true)
-                    .trigger('change');
-            }
-
-            function updateMontantField(taxId) {
-                let amount = config.defaultAmount;
-
-                if (taxId === '00' && state.taxesData['00']) {
-                    amount = state.taxesData['00'].montant.toFixed(2);
-                } else if (taxId && state.taxesData[taxId]) {
-                    amount = state.taxesData[taxId].montant.toFixed(2);
-                }
-
-                $('#montant').val(amount + config.currency);
-            }
-
-            function loadTaxes(url) {
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    beforeSend: function() {
-                        $('#taxe_entreprise').prop('disabled', true);
-                    },
-                    success: function(response) {
-                        processTaxesResponse(response);
-                    },
-                    error: function(xhr, status, error) {
-                        handleTaxesLoadError(error);
-                    }
-                });
-            }
-
-            function processTaxesResponse(response) {
-                const taxeSelect = $('#taxe_entreprise');
-                state.taxesData = {}; // Reset tax data
-
-                taxeSelect.empty();
-                addDefaultOptions(taxeSelect);
-
-                if (response.data?.length > 0) {
-                    const totalMontant = processTaxesData(response.data);
-                    createTaxOptions(taxeSelect, totalMontant);
-                    restoreSelection(taxeSelect);
-                } else {
-                    taxeSelect.append(`<option value="">${config.errorMessages.noTaxes}</option>`);
-                }
-
-                taxeSelect.prop('disabled', false).trigger('change');
-            }
-
-            function processTaxesData(taxes) {
-                let totalMontant = 0;
-
-                taxes.forEach(taxe => {
-                    const montant = parseFloat(taxe.montant) || 0;
-                    state.taxesData[taxe.id] = {
-                        periode: taxe.periode,
-                        montant: montant
-                    };
-                    totalMontant += montant;
-                });
-
-                // Add total option
-                state.taxesData['00'] = {
-                    periode: "Toutes les taxes",
-                    montant: totalMontant
-                };
-
-                return totalMontant;
-            }
-
-            function addDefaultOptions(selectElement) {
-                config.defaultTaxeSelectOptions.forEach(option => {
-                    selectElement.append(new Option(option.text, option.value));
-                });
-            }
-
-            function createTaxOptions(selectElement) {
-                Object.entries(state.taxesData).forEach(([id, taxe]) => {
-                    if (id !== '00') {
-                        selectElement.append(new Option(
-                            `${taxe.periode} - ${taxe.montant.toFixed(2)}${config.currency}`,
-                            id
-                        ));
-                    }
-                });
-            }
-
-            function restoreSelection(selectElement) {
-                const oldTax = @json(old('taxe_entreprise', ''));
-                selectElement.val(oldTax || '0').trigger('change');
-            }
-
-            function handleTaxesLoadError(error) {
-                console.error("Erreur AJAX:", error);
-
-                const taxeSelect = $('#taxe_entreprise');
-                taxeSelect.empty();
-                addDefaultOptions(taxeSelect);
-                taxeSelect.append('<option value="">Erreur de chargement</option>')
-                    .prop('disabled', false)
-                    .trigger('change');
-
-                resetMontantField();
-                toastr.error(config.errorMessages.loadError, 'Erreur');
-            }
-        })();
-    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -697,6 +355,129 @@
                 input.addEventListener('blur', function() {
                     this.parentElement.style.transform = 'scale(1)';
                 });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Sélectionnez une option",
+                allowClear: true
+            });
+
+            $('#entreprise_id').on('change', function() {
+                const messageInput = document.getElementById("feedback");
+                messageInput.innerHTML = '';
+                messageInput.style = "font-size: 16px";
+                const selectedValue = $(this).val();
+                const select = $('#taxe_entreprise');
+                select.prop('disabled', true);
+                $('#taxe_entreprise').empty().append('<option value="0">⏳ Chargement...</option>');
+                if (selectedValue === '') {
+                    $('#taxe_entreprise').empty().append(
+                        '<option value="0">Sélectionnez d\'abord une entreprise</option>');
+                    select.prop('disabled', false);
+                    return;
+                }
+                fetch(`/listeTaxeApi/${selectedValue}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Erreur serveur (${response.status})`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        $('#taxe_entreprise').empty();
+                        let taxeSelect = $('#taxe_entreprise');
+                        taxeSelect.empty();
+                        taxesData = {}; // Réinitialiser les données
+
+                        // Ajouter les options par défaut
+                        taxeSelect.append('<option value="0">Sélectionner la taxe</option>');
+                        taxeSelect.append('<option value="00">Payer toutes les taxes</option>');
+                        console.log(data);
+                        if (data.status === 200 && Array.isArray(data.data)) {
+                            // $('#taxe_entreprise').append(
+                            //     '<option value="0">-- Choisir la taxe à payer --</option>');
+                            // data.data.forEach(t => {
+                            //     $('#taxe_entreprise').append(
+                            //         `<option value="${t.id}">${t.periode} ${parseFloat(t.montant)}</option> `
+                            //     );
+                            // });
+
+                            let totalMontant = 0;
+                            data.data.forEach(function(taxe) {
+                                taxesData[taxe.id] = {
+                                    periode: taxe.periode,
+                                    montant: parseFloat(taxe.montant) || 0
+                                };
+                                totalMontant += taxesData[taxe.id].montant;
+                            });
+                            taxesData['00'] = {
+                                periode: "Toutes les taxes",
+                                montant: totalMontant
+                            };
+
+                            $.each(taxesData, function(id, taxe) {
+                                if (id !==
+                                    '00'
+                                    ) { // On ajoute pas '00' car déjà ajouté comme option par défaut
+                                    taxeSelect.append(new Option(
+                                        `${taxe.periode} - ${taxe.montant.toFixed(2)} FCFA`,
+                                        id,
+                                        false,
+                                        false
+                                    ));
+                                }
+                            });
+
+                            // Sélectionner l'ancienne valeur si elle existe
+                            let oldTax = @json(old('taxe_entreprise', ''));
+                            if (oldTax) {
+                                taxeSelect.val(oldTax).trigger('change');
+                            } else {
+                                // Sélectionner l'option par défaut
+                                taxeSelect.val('0').trigger('change');
+                            }
+
+
+
+                        } else {
+                            messageInput.innerHTML =
+                                `<strong>${data.message || "Aucune donnée reçue."}</strong>`;
+                            $('#taxe_entreprise').empty().append(
+                                '<option value="0">Indiquer une entreprise...</option>');
+                        }
+                    })
+                    .catch(error => {
+                        messageInput.innerHTML = `<strong>Erreur : ${error.message}</strong>`;
+                        $('#taxe_entreprise').empty().append(
+                            '<option value="0">-- Erreur de chargement --</option>');
+                    })
+                    .finally(() => {
+                        select.prop('disabled', false);
+                    });
+            });
+
+            $('#taxe_entreprise').on('change', function() {
+                let selectedTaxId = $(this).val();
+
+                if (selectedTaxId === '00' && taxesData['00']) {
+                    // Cas "Payer toutes les taxes"
+                    $('#montant').val(taxesData['00'].montant.toFixed(2) + ' FCFA');
+                } else if (selectedTaxId && taxesData[selectedTaxId]) {
+                    // Cas d'une taxe spécifique
+                    $('#montant').val(taxesData[selectedTaxId].montant.toFixed(2) + ' FCFA');
+                } else {
+                    // Cas par défaut
+                    $('#montant').val('0.00 FCFA');
+                }
             });
         });
     </script>
