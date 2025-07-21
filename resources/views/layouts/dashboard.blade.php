@@ -9,6 +9,226 @@
     <meta name="keyword" content="Plateforme de CIAPOL ">
     <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon"> <!-- Favicon-->
     <title>{{ $title }}</title>
+
+    <link rel="stylesheet" href="{{ asset('assets/cssbundle/daterangepicker.min.css') }}">
+    <!-- project css file  -->
+    <link rel="stylesheet" href="{{ asset('assets/css/luno-style.css') }}">
+    <!-- my style -->
+    <link rel="stylesheet" href="{{ asset('assets/css/mystyle.css') }}">
+    <!-- Jquery Core Js -->
+    <script src="{{ asset('assets/js/plugins.js') }}"></script>
+
+
+
+      <link rel="stylesheet" href="{{ asset('assets/css/luno-style.css') }}">
+  <style>
+      :root {
+          --primary: #4361ee;
+          --secondary: #3f37c9;
+          --success: #4cc9f0;
+          --light: #f8f9fa;
+          --dark: #212529;
+          --danger: #f72585;
+      }
+
+      * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+          background-color: #f5f7fa;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          padding: 20px;
+      }
+
+      .upload-container {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          max-width: 500px;
+          padding: 40px;
+          transition: all 0.3s ease;
+      }
+
+      .upload-header {
+          text-align: center;
+          margin-bottom: 30px;
+      }
+
+      .upload-header h1 {
+          color: var(--dark);
+          font-size: 24px;
+          margin-bottom: 10px;
+      }
+
+      .upload-header p {
+          color: #6c757d;
+          font-size: 14px;
+      }
+
+      .upload-area {
+          border: 2px dashed #ced4da;
+          border-radius: 8px;
+          padding: 30px;
+          text-align: center;
+          margin-bottom: 20px;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+      }
+
+      .upload-area.active {
+          border-color: var(--primary);
+          background-color: rgba(67, 97, 238, 0.05);
+      }
+
+      .upload-area i {
+          font-size: 48px;
+          color: var(--primary);
+          margin-bottom: 15px;
+      }
+
+      .upload-area h3 {
+          font-size: 18px;
+          color: var(--dark);
+          margin-bottom: 5px;
+      }
+
+      .upload-area p {
+          font-size: 14px;
+          color: #6c757d;
+          margin-bottom: 15px;
+      }
+
+      .file-input {
+          display: none;
+      }
+
+      .browse-btn {
+          background-color: var(--primary);
+          color: white;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border: none;
+          font-weight: 500;
+      }
+
+      .browse-btn:hover {
+          background-color: var(--secondary);
+          transform: translateY(-2px);
+      }
+
+      .submit-btn {
+          width: 100%;
+          background-color: var(--primary);
+          color: white;
+          padding: 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border: none;
+          font-weight: 500;
+          font-size: 16px;
+      }
+
+      .submit-btn:hover {
+          background-color: var(--secondary);
+      }
+
+      .submit-btn:disabled {
+          background-color: #cccccc;
+          cursor: not-allowed;
+      }
+
+      .file-info {
+          margin-top: 15px;
+          padding: 10px;
+          background-color: #f8f9fa;
+          border-radius: 6px;
+          display: none;
+      }
+
+      .file-info.active {
+          display: block;
+          animation: fadeIn 0.3s ease;
+      }
+
+      .file-info p {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 5px;
+      }
+
+      .file-name {
+          font-weight: 500;
+          color: var(--dark);
+      }
+
+      .file-size {
+          color: #6c757d;
+          font-size: 12px;
+      }
+
+      .remove-file {
+          color: var(--danger);
+          cursor: pointer;
+          font-size: 12px;
+          margin-left: 10px;
+      }
+
+      .alert {
+          padding: 15px;
+          border-radius: 6px;
+          margin-bottom: 20px;
+          animation: fadeIn 0.3s ease;
+      }
+
+      .alert-success {
+          background-color: rgba(76, 201, 240, 0.2);
+          color: #0c5460;
+          border-left: 4px solid var(--success);
+      }
+
+      .alert-danger {
+          background-color: rgba(247, 37, 133, 0.1);
+          color: #721c24;
+          border-left: 4px solid var(--danger);
+      }
+
+      .alert ul {
+          margin-left: 20px;
+      }
+
+      @keyframes fadeIn {
+          from {
+              opacity: 0;
+              transform: translateY(-10px);
+          }
+
+          to {
+              opacity: 1;
+              transform: translateY(0);
+          }
+      }
+
+      @media (max-width: 576px) {
+          .upload-container {
+              padding: 20px;
+          }
+      }
+  </style>
+
+
+
     @stack('css')
 </head>
 
@@ -544,6 +764,9 @@
         };
         new ApexCharts(document.querySelector("#revenue_sales"), revenue_sales).render();
     </script>
+
+    <!-- Jquery Core Js -->
+  <script src="{{ asset('assets/js/plugins.js') }}"></script>
 </body>
 
 </html>

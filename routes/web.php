@@ -116,6 +116,11 @@ Route::middleware('auth')->group(function () {
             // ajouter dans la view
             Route::get('/pageEnregistrementCheque/virement','create')->name('cheque.create');
             Route::post('/enregistremCheOuVir','store')->name('cheque.store');
+
+            Route::get('/pageEditCheque/{id}','editer')->name('cheque.edit');
+            Route::post('/miseajourCheque/{id}','updateMiseAjoute')->name('cheque.update');
+
+            Route::post('/desactiverCheque/{id}','suppressionCheque')->name('cheque.desactive');
         });
     });
 

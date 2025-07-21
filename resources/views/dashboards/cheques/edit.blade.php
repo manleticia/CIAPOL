@@ -62,7 +62,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Information sur le chèque</h5>
 
-                    <form action="{{ route('cheque.store') }}" method="POST" id="add_admin_form"
+                    <form action="{{ route('cheque.update', $cheque->id) }}" method="POST" id="add_admin_form"
                         enctype="multipart/form-data" class="needs-validation" novalidate>
                         @csrf
                         @php
@@ -80,7 +80,7 @@
                                         <option value="">Sélectionnez une entreprise</option>
                                         @foreach ($entreprises as $entreprise)
                                             <option value="{{ $entreprise->id }}"
-                                                {{ old('entreprise_id') == $entreprise->id ? 'selected' : '' }}>
+                                                {{ old('entreprise_id', $cheque->entreprise_id) == $entreprise->id ? 'selected' : '' }}>
                                                 {{ $entreprise->raison_sociale }}
                                             </option>
                                         @endforeach
@@ -113,7 +113,7 @@
                                     <label for="montant">Montant <span class="text-danger fw-bold">*</span></label>
                                     <input type="text" name="montant" id="montant"
                                         class="form-control @error('montant') is-invalid @enderror"
-                                        value="{{ old('montant', '0.00 FCFA') }}" readonly>
+                                        value="{{ old('montant', $cheque->montant . ' FCFA' ?? '0.00 FCFA') }}" readonly>
                                     @error('montant')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -129,10 +129,16 @@
                                     <select class="form-control @error('NaturePaiement') is-invalid @enderror"
                                         id="NaturePaiement" name="NaturePaiement" required>
                                         <option value="">Sélectionnez la nature</option>
-                                        <option value="CHEQUE" {{ old('NaturePaiement') == 'CHEQUE' ? 'selected' : '' }}>
-                                            Chèque</option>
+
+                                        <option value="CHEQUE"
+                                            {{ old('NaturePaiement', $cheque->NaturePaiement) == 'CHEQUE' ? 'selected' : '' }}>
+                                            Chèque
+                                        </option>
+
                                         <option value="VIREMENT"
-                                            {{ old('NaturePaiement') == 'VIREMENT' ? 'selected' : '' }}>Virement</option>
+                                            {{ old('NaturePaiement', $cheque->NaturePaiement) == 'VIREMENT' ? 'selected' : '' }}>
+                                            Virement
+                                        </option>
                                     </select>
                                     @error('NaturePaiement')
                                         <span class="invalid-feedback" role="alert">
@@ -145,9 +151,10 @@
                                 <div class="form-group">
                                     <label for="numero_cheque">Numéro du <span class="text-danger fw-bold">*</span></label>
                                     <input type="text" name="numero_cheque" id="numero_cheque"
-                                        value="{{ old('numero_cheque') }}"
-                                        class="form-control @error('montant') is-invalid @enderror" pattern="[A-Za-z0-9-]+"
-                                        title="Caractères alphanumériques et tirets uniquement" placeholder="CHQ-2023-001">
+                                        value="{{ old('numero_cheque', $cheque->numero_cheque) }}"
+                                        class="form-control @error('numero_cheque') is-invalid @enderror"
+                                        pattern="[A-Za-z0-9-]+" title="Caractères alphanumériques et tirets uniquement"
+                                        placeholder="CHQ-2023-001">
                                     @error('numero_cheque')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -164,21 +171,29 @@
                                     <select class="form-control @error('banque') is-invalid @enderror" id="banque-select"
                                         name="banque" required>
                                         <option value="">-- Sélectionnez votre banque --</option>
-                                        <option value="BOA" {{ old('banque') == 'BOA' ? 'selected' : '' }}>Bank of
+                                        <option value="BOA"
+                                            {{ old('banque', $cheque->banque) == 'BOA' ? 'selected' : '' }}>Bank of
                                             Africa (BOA)</option>
-                                        <option value="ECOBANK" {{ old('banque') == 'ECOBANK' ? 'selected' : '' }}>Ecobank
+                                        <option value="ECOBANK"
+                                            {{ old('banque', $cheque->banque) == 'ECOBANK' ? 'selected' : '' }}>Ecobank
                                         </option>
-                                        <option value="UBA" {{ old('banque') == 'UBA' ? 'selected' : '' }}>United Bank
+                                        <option value="UBA"
+                                            {{ old('banque', $cheque->banque) == 'UBA' ? 'selected' : '' }}>United Bank
                                             for Africa (UBA)</option>
-                                        <option value="NSIA" {{ old('banque') == 'NSIA' ? 'selected' : '' }}>Banque NSIA
+                                        <option value="NSIA"
+                                            {{ old('banque', $cheque->banque) == 'NSIA' ? 'selected' : '' }}>Banque NSIA
                                         </option>
-                                        <option value="SGBCI" {{ old('banque') == 'SGBCI' ? 'selected' : '' }}>Société
+                                        <option value="SGBCI"
+                                            {{ old('banque', $cheque->banque) == 'SGBCI' ? 'selected' : '' }}>Société
                                             Générale Côte d'Ivoire (SGBCI)</option>
-                                        <option value="BICICI" {{ old('banque') == 'BICICI' ? 'selected' : '' }}>BICICI
+                                        <option value="BICICI"
+                                            {{ old('banque', $cheque->banque) == 'BICICI' ? 'selected' : '' }}>BICICI
                                         </option>
-                                        <option value="SIB" {{ old('banque') == 'SIB' ? 'selected' : '' }}>Société
+                                        <option value="SIB"
+                                            {{ old('banque', $cheque->banque) == 'SIB' ? 'selected' : '' }}>Société
                                             Ivoirienne de Banque (SIB)</option>
-                                        <option value="AUTRE" {{ old('banque') == 'AUTRE' ? 'selected' : '' }}>Autre
+                                        <option value="AUTRE"
+                                            {{ old('banque', $cheque->banque) == 'AUTRE' ? 'selected' : '' }}>Autre
                                             banque</option>
                                     </select>
                                     @error('banque')
@@ -196,7 +211,7 @@
                                     <label for="autre-banque">Précisez votre banque <span
                                             class="text-danger fw-bold">*</span></label>
                                     <input type="text" name="autre_banque" id="autre-banque"
-                                        value="{{ old('autre_banque') }}"
+                                        value="{{ old('autre_banque', $cheque->autre_banque) }}"
                                         class="form-control @error('autre_banque') is-invalid @enderror"
                                         placeholder="Nom complet de votre banque">
                                     @error('autre_banque')
@@ -226,7 +241,7 @@
                                             class="text-danger fw-bold">*</span></label>
                                     <input type="text" name="titulaire" id="titulaire"
                                         class="form-control @error('titulaire') is-invalid @enderror" required
-                                        value="{{ old('titulaire') }}"
+                                        value="{{ old('titulaire', $cheque->titulaire) }}"
                                         placeholder="Nom tel qu'il apparaît sur le chèque">
                                     @error('titulaire')
                                         <span class="invalid-feedback" role="alert">
@@ -239,7 +254,7 @@
                                 <div class="form-group">
                                     <label for="notes">Notes complémentaires</label>
                                     <textarea id="notes" class="form-control @error('notes') is-invalid @enderror" name="notes" rows="3"
-                                        placeholder="Référence client, informations supplémentaires...">{{ old('notes') }}</textarea>
+                                        placeholder="Référence client, informations supplémentaires...">{{ old('notes', $cheque->notes) }}</textarea>
                                     @error('notes')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -260,7 +275,7 @@
 
                             <div class="row mt-4">
                                 <div class="col-12 text-center">
-                                    <button type="reset" class="btn btn-secondary mx-2">Annuler</button>
+                                    <a href="{{ route('listCheques') }}" class="btn btn-secondary mx-2">Annuler</a>
                                     <button type="submit" id="add_admin_btn"
                                         class="btn btn-primary mx-2">Enregistrer</button>
                                 </div>
@@ -309,19 +324,21 @@
             }
         });
         document.addEventListener('DOMContentLoaded', function() {
-            // Gestion de l'affichage du champ "autre banque"
+
             const banqueSelect = document.getElementById('banque-select');
             const autreBanqueContainer = document.getElementById('autre-banque-container');
-
-            banqueSelect.addEventListener('change', function() {
-                if (this.value === 'AUTRE') {
+            const autreBanqueInput = document.getElementById('autre-banque');
+            function toggleAutreBanque() {
+                if (banqueSelect.value === 'AUTRE') {
                     autreBanqueContainer.style.display = 'block';
-                    document.getElementById('autre-banque').required = true;
+                    autreBanqueInput.required = true;
                 } else {
                     autreBanqueContainer.style.display = 'none';
-                    document.getElementById('autre-banque').required = false;
+                    autreBanqueInput.required = false;
                 }
-            });
+            }
+            toggleAutreBanque();
+            banqueSelect.addEventListener('change', toggleAutreBanque);
 
             // Validation du formulaire
             const form = document.getElementById('cheque-form');
@@ -359,11 +376,143 @@
         });
     </script>
     <script>
+        // $(document).ready(function() {
+        //     $('.select2').select2({
+        //         placeholder: "Sélectionnez une option",
+        //         allowClear: true
+        //     });
+
+        //     $('#entreprise_id').on('change', function() {
+        //         const messageInput = document.getElementById("feedback");
+        //         messageInput.innerHTML = '';
+        //         messageInput.style = "font-size: 16px";
+        //         const selectedValue = $(this).val();
+        //         const select = $('#taxe_entreprise');
+        //         select.prop('disabled', true);
+        //         $('#taxe_entreprise').empty().append('<option value="0">⏳ Chargement...</option>');
+        //         if (selectedValue === '') {
+        //             $('#taxe_entreprise').empty().append(
+        //                 '<option value="0">Sélectionnez d\'abord une entreprise</option>');
+        //             select.prop('disabled', false);
+        //             return;
+        //         }
+        //         fetch(`/listeTaxeApi/${selectedValue}`, {
+        //                 method: 'GET',
+        //                 headers: {
+        //                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        //                     'Accept': 'application/json'
+        //                 }
+        //             })
+        //             .then(response => {
+        //                 if (!response.ok) {
+        //                     throw new Error(`Erreur serveur (${response.status})`);
+        //                 }
+        //                 return response.json();
+        //             })
+        //             .then(data => {
+        //                 $('#taxe_entreprise').empty();
+        //                 let taxeSelect = $('#taxe_entreprise');
+        //                 taxeSelect.empty();
+        //                 taxesData = {}; // Réinitialiser les données
+
+        //                 // Ajouter les options par défaut
+        //                 taxeSelect.append('<option value="0">Sélectionner la taxe</option>');
+        //                 taxeSelect.append('<option value="00">Payer toutes les taxes</option>');
+        //                 console.log(data);
+        //                 if (data.status === 200 && Array.isArray(data.data)) {
+        //                     // $('#taxe_entreprise').append(
+        //                     //     '<option value="0">-- Choisir la taxe à payer --</option>');
+        //                     // data.data.forEach(t => {
+        //                     //     $('#taxe_entreprise').append(
+        //                     //         `<option value="${t.id}">${t.periode} ${parseFloat(t.montant)}</option> `
+        //                     //     );
+        //                     // });
+
+        //                     let totalMontant = 0;
+        //                     data.data.forEach(function(taxe) {
+        //                         taxesData[taxe.id] = {
+        //                             periode: taxe.periode,
+        //                             montant: parseFloat(taxe.montant) || 0
+        //                         };
+        //                         totalMontant += taxesData[taxe.id].montant;
+        //                     });
+        //                     taxesData['00'] = {
+        //                         periode: "Toutes les taxes",
+        //                         montant: totalMontant
+        //                     };
+
+        //                     $.each(taxesData, function(id, taxe) {
+        //                         if (id !==
+        //                             '00'
+        //                         ) { // On ajoute pas '00' car déjà ajouté comme option par défaut
+        //                             taxeSelect.append(new Option(
+        //                                 `${taxe.periode} - ${taxe.montant.toFixed(2)} FCFA`,
+        //                                 id,
+        //                                 false,
+        //                                 false
+        //                             ));
+        //                         }
+        //                     });
+
+        //                     // Sélectionner l'ancienne valeur si elle existe
+        //                     let oldTax = @json(old('taxe_entreprise', $cheque->taxe_entreprise_id ?? ''));
+        //                     if (oldTax) {
+        //                         taxeSelect.val(oldTax).trigger('change');
+        //                     } else {
+        //                         // Sélectionner l'option par défaut
+        //                         taxeSelect.val('0').trigger('change');
+        //                     }
+
+
+
+        //                 } else {
+        //                     messageInput.innerHTML =
+        //                         `<strong>${data.message || "Aucune donnée reçue."}</strong>`;
+        //                     $('#taxe_entreprise').empty().append(
+        //                         '<option value="0">Indiquer une entreprise...</option>');
+        //                 }
+        //             })
+        //             .catch(error => {
+        //                 messageInput.innerHTML = `<strong>Erreur : ${error.message}</strong>`;
+        //                 $('#taxe_entreprise').empty().append(
+        //                     '<option value="0">-- Erreur de chargement --</option>');
+        //             })
+        //             .finally(() => {
+        //                 select.prop('disabled', false);
+        //             });
+        //     });
+
+        //     $('#taxe_entreprise').on('change', function() {
+        //         let selectedTaxId = $(this).val();
+
+        //         if (selectedTaxId === '00' && taxesData['00']) {
+        //             // Cas "Payer toutes les taxes"
+        //             $('#montant').val(taxesData['00'].montant.toFixed(2) + ' FCFA');
+        //         } else if (selectedTaxId && taxesData[selectedTaxId]) {
+        //             // Cas d'une taxe spécifique
+        //             $('#montant').val(taxesData[selectedTaxId].montant.toFixed(2) + ' FCFA');
+        //         } else {
+        //             // Cas par défaut
+        //             $('#montant').val('0.00 FCFA');
+        //         }
+        //     });
+        // });
         $(document).ready(function() {
             $('.select2').select2({
                 placeholder: "Sélectionnez une option",
                 allowClear: true
             });
+
+            // Initialiser avec l'entreprise déjà sélectionnée si en mode édition
+            const initialEntrepriseId = @json($cheque->entreprise_id ?? '');
+            if (initialEntrepriseId) {
+                $('#entreprise_id').val(initialEntrepriseId).trigger('change');
+
+                // Charger immédiatement les taxes pour cette entreprise
+                setTimeout(() => {
+                    $('#entreprise_id').trigger('change');
+                }, 100);
+            }
 
             $('#entreprise_id').on('change', function() {
                 const messageInput = document.getElementById("feedback");
@@ -373,12 +522,14 @@
                 const select = $('#taxe_entreprise');
                 select.prop('disabled', true);
                 $('#taxe_entreprise').empty().append('<option value="0">⏳ Chargement...</option>');
+
                 if (selectedValue === '') {
                     $('#taxe_entreprise').empty().append(
                         '<option value="0">Sélectionnez d\'abord une entreprise</option>');
                     select.prop('disabled', false);
                     return;
                 }
+
                 fetch(`/listeTaxeApi/${selectedValue}`, {
                         method: 'GET',
                         headers: {
@@ -401,16 +552,8 @@
                         // Ajouter les options par défaut
                         taxeSelect.append('<option value="0">Sélectionner la taxe</option>');
                         taxeSelect.append('<option value="00">Payer toutes les taxes</option>');
-                        console.log(data);
-                        if (data.status === 200 && Array.isArray(data.data)) {
-                            // $('#taxe_entreprise').append(
-                            //     '<option value="0">-- Choisir la taxe à payer --</option>');
-                            // data.data.forEach(t => {
-                            //     $('#taxe_entreprise').append(
-                            //         `<option value="${t.id}">${t.periode} ${parseFloat(t.montant)}</option> `
-                            //     );
-                            // });
 
+                        if (data.status === 200 && Array.isArray(data.data)) {
                             let totalMontant = 0;
                             data.data.forEach(function(taxe) {
                                 taxesData[taxe.id] = {
@@ -425,9 +568,7 @@
                             };
 
                             $.each(taxesData, function(id, taxe) {
-                                if (id !==
-                                    '00'
-                                    ) { // On ajoute pas '00' car déjà ajouté comme option par défaut
+                                if (id !== '00') {
                                     taxeSelect.append(new Option(
                                         `${taxe.periode} - ${taxe.montant.toFixed(2)} FCFA`,
                                         id,
@@ -437,16 +578,13 @@
                                 }
                             });
 
-                            // Sélectionner l'ancienne valeur si elle existe
-                            let oldTax = @json(old('taxe_entreprise', ''));
-                            if (oldTax) {
-                                taxeSelect.val(oldTax).trigger('change');
+                            // Pré-sélectionner la taxe en mode édition
+                            const taxeToSelect = @json($cheque->taxe_entreprise_id ?? '0');
+                            if (taxeToSelect && taxesData[taxeToSelect]) {
+                                taxeSelect.val(taxeToSelect).trigger('change');
                             } else {
-                                // Sélectionner l'option par défaut
                                 taxeSelect.val('0').trigger('change');
                             }
-
-
 
                         } else {
                             messageInput.innerHTML =
@@ -469,13 +607,10 @@
                 let selectedTaxId = $(this).val();
 
                 if (selectedTaxId === '00' && taxesData['00']) {
-                    // Cas "Payer toutes les taxes"
                     $('#montant').val(taxesData['00'].montant.toFixed(2) + ' FCFA');
                 } else if (selectedTaxId && taxesData[selectedTaxId]) {
-                    // Cas d'une taxe spécifique
                     $('#montant').val(taxesData[selectedTaxId].montant.toFixed(2) + ' FCFA');
                 } else {
-                    // Cas par défaut
                     $('#montant').val('0.00 FCFA');
                 }
             });

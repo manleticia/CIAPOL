@@ -260,7 +260,7 @@
 
                             <div class="row mt-4">
                                 <div class="col-12 text-center">
-                                    <button type="reset" class="btn btn-secondary mx-2">Annuler</button>
+                                    <a href="{{ route('listCheques') }}"  class="btn btn-secondary mx-2">Annuler</a>
                                     <button type="submit" id="add_admin_btn"
                                         class="btn btn-primary mx-2">Enregistrer</button>
                                 </div>
