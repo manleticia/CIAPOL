@@ -137,3 +137,11 @@ function extraireMontantEntier($montantAvecDevise)
     $montantNet = preg_replace('/[^0-9.]/', '', $montantAvecDevise);
     return (int) floatval($montantNet);
 }
+
+function dateDuJourEnFrancais()
+{
+    setlocale(LC_TIME, 'fr_FR.UTF-8'); // Pour Linux/macOS
+    // setlocale(LC_TIME, 'french');   // Pour Windows si nécessaire
+
+    return ucfirst(strftime('%A %d %B %Y'));
+}

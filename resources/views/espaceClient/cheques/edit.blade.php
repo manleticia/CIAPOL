@@ -360,8 +360,9 @@
             </div>
 
             <div class="payment-body">
-                <form action="{{ route('espaceClient.cheques.enregistre') }}" method="POST" id="cheque-form">
+                <form action="{{ route('espaceClient.chequeEnregistreUdapte',$cheque->id) }}" method="POST" id="cheque-form">
                     @csrf
+                    @method('POST')
                     <div class="amount-display">
                         <div class="label">Montant total à régler <br>
                             <p> {{ $libelle ?? '' }}</p>
@@ -374,21 +375,28 @@
                     @endif
 
 
-                    <div class="form-group">
-                        <label for="banque-select" class="required-field">Nature</label>
-                        <select id="NaturePaiement" name="NaturePaiement" required>
-                            <option value="">-- Sélectionnez la nature --</option>
-                            <option value="CHEQUE">Chèque</option>
-                            <option value="VIREMENT">Virement</option>
-
+                    <div class="form-group mb-3">
+                        <label for="NaturePaiement" class="form-label required-field">Nature</label>
+                        <select class="form-select" id="NaturePaiement" name="NaturePaiement" required>
+                            <option value="" disabled selected>-- Sélectionnez la nature --</option>
+                            <option value="CHEQUE"
+                                {{ old('NaturePaiement', $cheque->NaturePaiement ?? '') == 'CHEQUE' ? 'selected' : '' }}>
+                                Chèque</option>
+                            <option value="VIREMENT"
+                                {{ old('NaturePaiement', $cheque->NaturePaiement ?? '') == 'VIREMENT' ? 'selected' : '' }}>
+                                Virement</option>
                         </select>
+                        @error('NaturePaiement')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
 
                     <div class="form-group">
                         <label for="numero_cheque" class="required-field">Numéro du chèque</label>
                         <div class="input-wrapper">
-                            <input type="text" id="numero_cheque" name="numero_cheque" required
+                            <input type="text" id="numero_cheque" name="numero_cheque"
+                                value="{{ old('numero_cheque', $cheque->numero_cheque) }}" required
                                 pattern="[A-Za-z0-9-]+" title="Caractères alphanumériques et tirets uniquement"
                                 placeholder="CHQ-2023-001">
                             <i class="fas fa-hashtag input-icon"></i>
@@ -396,47 +404,74 @@
                         <span class="form-note">Ex: CHQ-2023-001 ou 2023/CHQ/001</span>
                     </div>
 
-                    <div class="form-group">
-                        <label for="banque-select" class="required-field">Banque émettrice</label>
-                        <select id="banque-select" name="banque" required>
-                            <option value="">-- Sélectionnez votre banque --</option>
-                            <option value="BOA">Bank of Africa (BOA)</option>
-                            <option value="ECOBANK">Ecobank</option>
-                            <option value="UBA">United Bank for Africa (UBA)</option>
-                            <option value="NSIA">Banque NSIA</option>
-                            <option value="SGBCI">Société Générale Côte d'Ivoire (SGBCI)</option>
-                            <option value="BICICI">BICICI</option>
-                            <option value="SIB">Société Ivoirienne de Banque (SIB)</option>
-                            <option value="AUTRE">Autre banque</option>
+                    <div class="form-group mb-3">
+                        <label for="banque-select" class="form-label required-field">Banque émettrice</label>
+                        <select class="form-select" id="banque-select" name="banque" required>
+                            <option value="" disabled
+                                {{ old('banque', $cheque->banque ?? '') ? '' : 'selected' }}>-- Sélectionnez votre
+                                banque --</option>
+                            <option value="BOA"
+                                {{ old('banque', $cheque->banque ?? '') == 'BOA' ? 'selected' : '' }}>Bank of Africa
+                                (BOA)</option>
+                            <option value="ECOBANK"
+                                {{ old('banque', $cheque->banque ?? '') == 'ECOBANK' ? 'selected' : '' }}>Ecobank
+                            </option>
+                            <option value="UBA"
+                                {{ old('banque', $cheque->banque ?? '') == 'UBA' ? 'selected' : '' }}>United Bank for
+                                Africa (UBA)</option>
+                            <option value="NSIA"
+                                {{ old('banque', $cheque->banque ?? '') == 'NSIA' ? 'selected' : '' }}>Banque NSIA
+                            </option>
+                            <option value="SGBCI"
+                                {{ old('banque', $cheque->banque ?? '') == 'SGBCI' ? 'selected' : '' }}>Société
+                                Générale Côte d'Ivoire (SGBCI)</option>
+                            <option value="BICICI"
+                                {{ old('banque', $cheque->banque ?? '') == 'BICICI' ? 'selected' : '' }}>BICICI
+                            </option>
+                            <option value="SIB"
+                                {{ old('banque', $cheque->banque ?? '') == 'SIB' ? 'selected' : '' }}>Société
+                                Ivoirienne de Banque (SIB)</option>
+                            <option value="AUTRE"
+                                {{ old('banque', $cheque->banque ?? '') == 'AUTRE' ? 'selected' : '' }}>Autre banque
+                            </option>
                         </select>
+                        @error('banque')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div id="autre-banque-container" class="form-group" style="display: none;">
                         <label for="autre-banque" class="required-field">Précisez votre banque</label>
                         <input type="text" id="autre-banque" name="autre_banque"
+                            value="{{ old('autre_banque', $cheque->autre_banque ?? '') }}"
                             placeholder="Nom complet de votre banque">
+                        @error('autre_banque')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="form-group">
                         <label for="date_emission" class="required-field">Date d'émission</label>
-                        <input type="date" id="date_emission" name="date_emission" required max="{{ date('Y-m-d') }}"
-                            value="{{ old('date_emission', date('Y-m-d')) }}">
+                        <input type="date" id="date_emission" name="date_emission" required
+                            max="{{ date('Y-m-d') }}" value="{{ old('date_emission', $cheque->date_emission ?? date('Y-m-d') ) }}">
                     </div>
 
                     <div class="form-group">
                         <label for="titulaire">Nom du titulaire du compte</label>
                         <input type="text" id="titulaire" name="titulaire"
+                         value="{{ old('titulaire', $cheque->titulaire ?? '') }}"
                             placeholder="Nom tel qu'il apparaît sur le chèque">
                     </div>
 
                     <div class="form-group">
                         <label for="notes">Notes complémentaires</label>
-                        <textarea id="notes" name="notes" rows="3" placeholder="Référence client, informations supplémentaires...">{{ old('notes') }}</textarea>
+                        <textarea id="notes" name="notes" rows="3" placeholder="Référence client, informations supplémentaires...">{{ old('notes', $cheque->notes ?? '') }}</textarea>
                     </div>
 
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="conditions" required>
-                        <label class="form-check-label" for="conditions">Je certifie que les informations fournies sont
+                        <label class="form-check-label" for="conditions">Je certifie que les informations fournies
+                            sont
                             exactes et que le chèque sera honoré</label>
                     </div>
 

@@ -21,5 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::controller(PaiementInitialController::class)->group(function(){
-Route::post('/Callback','callbackFunction');
+Route::post('/Callback','callbackFunction')->name('paiement_retour');
 });

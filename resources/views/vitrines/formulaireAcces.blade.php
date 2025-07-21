@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Création d'un accès utilisateur</title>
-     <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon"> 
+    <link rel="icon" href="{{ asset('photos/logo.png') }}" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -73,6 +73,15 @@
 
             </div>
         @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="access-card">
@@ -86,7 +95,7 @@
                             <input type="text" name="entreprise_id"
                                 value="{{ $entreprise->id ?? $inscrit->entreprise_id }}" hidden>
 
-                                <input type="text" name="inscrit_id"  value="{{ $inscrit->id }}" hidden>
+                            <input type="text" name="inscrit_id" value="{{ $inscrit->id }}" hidden>
                             <!-- Section Informations personnelles -->
                             <h5 class="mb-4 text-primary"><i class="fas fa-id-card me-2"></i>Informations personnelles
                             </h5>

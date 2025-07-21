@@ -39,7 +39,7 @@ class EspaceClientController extends Controller
             $valeur = TaxeEntreprise::findOrFail($id);
             $montant = $valeur->montant;
             // dd($valeur);
-            $libelle = 'Paiement du : ' . $valeur->semestre_depose;
+            $libelle = 'Paiement du : ' . $valeur->periode;
         } else {
             $montant = $request->montant;
             $valeur = [];
@@ -109,4 +109,60 @@ class EspaceClientController extends Controller
         Logs::saveLog($module, $action);
         return view('espaceClient.recupaiements', compact('paiements', 'cheques'));
     }
+
+    public function editChequeOuVirement($id)
+    {
+        $cheque = Cheque::findOrFail($id);
+        // dd($cheque);
+
+          if (!empty($cheque->taxe_entreprise_id)) {
+            $valeur = TaxeEntreprise::findOrFail($cheque->taxe_entreprise_id);
+            $montant = $cheque->montant;
+            // dd($valeur);
+            $libelle = 'Paiement du : ' . $valeur->periode;
+        } else {
+            $montant = $cheque->montant;
+            $valeur = [];
+            $libelle = 'Paiement de tout les factures de l\'entreprise';
+        }
+        $module = "Module Espace Clients  ";
+        $action = "A consulter la page de modification d'un cheque ou virement  ";
+        Logs::saveLog($module, $action);
+
+        return view('espaceClient.cheques.edit', compact('cheque','libelle','montant','valeur'));
+    }
+
+     public function chequEnregistreUdapte(Request $request , $id)
+    {
+        
+        $request->validate([
+            'montant' => 'required|numeric',
+            'numero_cheque' => 'required|string|max:255',
+            'banque' => 'required|string|max:255',
+            'date_emission' => 'required|date',
+            'titulaire' => 'required|string|max:255',
+        ]);
+        // Enregistrement du chèque
+        $us = auth()->user()->entreprise;
+        $cheque =  Cheque::findOrFail($id);
+        $cheque->entreprise_id = $us->id;
+        $cheque->taxe_entreprise_id = $request->idTaxe ?? null; // Si idtaxe est vide, on le met à null
+        $cheque->montant = $request->montant;
+        $cheque->numero_cheque = $request->numero_cheque;
+        $cheque->banque = $request->banque;
+        $cheque->autre_banque = $request->autre_banque ?? null; // Si autre_banque est vide, on le met à null
+        $cheque->date_emission = $request->date_emission;
+        $cheque->titulaire = $request->titulaire;
+        $cheque->NaturePaiement = $request->NaturePaiement;
+        $cheque->notes = $request->notes ?? null; // Si notes est vide, on le met à null
+        $cheque->status = 2; // En attente
+        $cheque->save();
+        // Redirection avec un message de succès
+        $module = "Module Espace Clients  ";
+        $action = "A enregistrer un cheque ou virement  ";
+        Logs::saveLog($module, $action);
+        return redirect()->route('succesCheque', $cheque->id ?? $id)->with('success', 'Chèque enregistré avec succès.');
+    }
+
+
 }

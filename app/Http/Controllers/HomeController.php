@@ -152,12 +152,15 @@ class HomeController extends Controller
             return redirect()->route('acceuil')->with('error', 'Code d\'inscription invalide ou expiré.');
         }
         $entreprise = Entreprise::where('id', $inscrit->entreprise_id)->first();
+        // dd($inscrit, $entreprise);
         return view('vitrines.formulaireAcces', compact('inscrit', 'entreprise'));
     }
 
     // traiment creation d'acces entreprise
     public function traitAcceEntreprise(Request $request)
     {
+
+            //    dd($request->all());
         $request->validate([
             'entreprise_id' => 'required|integer|exists:entreprises,id',
             'inscrit_id' => 'required|integer|exists:inscrits,id',
@@ -171,6 +174,7 @@ class HomeController extends Controller
             ],
             'password' => 'required|string|min:8|confirmed',
         ]);
+
 
 
         try {

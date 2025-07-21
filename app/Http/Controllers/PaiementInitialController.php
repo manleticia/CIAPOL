@@ -127,7 +127,7 @@ class PaiementInitialController extends Controller
                 // 'Url_Logo' =>  $logo,
                 'Url_Logo' =>  asset('photos/pci.png'),
                 'pay_fees' => 1,
-                // 'Url_Retour' => route('faclication_paiment_reussi',['codePaiement'=>$codePaiement]),
+                // 'Url_Retour' => route('passageCodeRetourHub',['codePaiement'=>$codePaiement]),
                 // 'Url_Callback' => route('paiement_retour'),
 
                 'Url_Retour' => 'https://127.0.0.1:8000/retourPaiementResultat/' . $codePaiement,
@@ -256,17 +256,20 @@ class PaiementInitialController extends Controller
                         $installationFinale->statut = 1; // Statut 1 pour indiquer que le paiement a été effectué
                         $installationFinale->save();
                     }
+                    $module = " Module Paiement";
+                    $action = 'a Effectuer un paiement succes sur le hub : ';
+                    Logs::saveLog($module, $action);
                 } else {
                     // paiement echouer
                     $paiementinit->status = 3; //
-                    $paiementinit->reference = $request->referencePaiement;
+                    $paiementinit->referencePaiement = $request->referencePaiement;
                     $paiementinit->message_retour =  "Echec du paiement";
+
+                    $module = " Module Paiement";
+                    $action = ' paiement echoue sur le hub : ';
+                    Logs::saveLog($module, $action);
                 }
                 $paiementinit->save();
-
-                $module = " Module Paiement";
-                $action = 'a Effectuer un paiement succes sur le hub : ';
-                Logs::saveLog($module, $action);
             } else {
                 $Chaine .= "\n//// verification code paiement:#" . $codePaiement . "# introuvable ou déjà notifié dans 'paiement_en_attentes'";
                 //       $log = new Logs();

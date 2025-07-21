@@ -312,6 +312,7 @@
                                                     <i class="fas fa-receipt"></i> recu
                                                 </a>
                                             @endif
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -416,7 +417,7 @@
                                     <th>Nature</th>
                                     <th>Motif</th>
                                     <th>Statut</th>
-                                    {{-- <th>Actions</th> --}}
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -454,7 +455,10 @@
                                                 <i class="fas fa-mobile-alt"></i> VIREMENT
                                             @endif
                                         </td>
-                                        <td>{{ $cheque->motif_rejet ?? 'xxxxxxxx' }}
+                                        <td> <span @if (!empty($cheque->motif_rejet)) style=" color: red;" @endif>
+                                                {{ $cheque->motif_rejet ?? 'xxxxxxxx' }}
+
+                                            </span>
                                         </td>
 
                                         <td>
@@ -472,49 +476,63 @@
                                                 </span>
                                             @endif
                                         </td>
-                                        {{-- <td>
-                                            @if ($cheque->status == 1)
-                                                <a href="{{ route('recuPay', $paiement->codePaiement) }}"
+                                        <td>
+                                            @if ($cheque->status == 2)
+                                                <a href="{{ route('espaceClient.editChequeOuVirement', $cheque->id) }}"
                                                     class="btn btn-primary btn-sm" target="_target">
-                                                    <i class="fas fa-receipt"></i> recu
+                                                    <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                                                        width="20" height="20"
+                                                        viewBox="0 0 512.000000 512.000000"
+                                                        preserveAspectRatio="xMidYMid meet">
+
+                                                        <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+                                                            fill="#FFFF" stroke="none">
+                                                            <path d="M445 5046 c-168 -42 -296 -162 -345 -326 -20 -64 -20 -97 -18 -2180
+                                                        l3 -2115 23 -58 c51 -126 160 -231 289 -280 l58 -22 1424 -3 c939 -1 1444 1
+                                                        1480 8 131 24 268 123 330 239 60 114 61 117 61 876 l0 689 623 626 c422 423
+                                                        630 638 642 665 11 22 21 71 23 108 7 105 -12 142 -135 269 -122 124 -167 149
+                                                        -268 149 -117 0 -122 -4 -522 -404 l-363 -362 0 555 0 555 -513 512 -512 513
+                                                        -1115 -1 c-849 0 -1127 -4 -1165 -13z m2175 -511 c0 -340 1 -368 20 -418 24
+                                                        -63 84 -127 149 -159 45 -23 54 -23 424 -26 l377 -3 0 -582 0 -582 -376 -376
+                                                        -376 -376 -42 -246 c-37 -222 -44 -248 -67 -274 -57 -60 -61 -92 -20 -134 39
+                                                        -39 63 -37 114 9 l42 39 230 37 c127 21 239 40 250 43 11 3 71 55 133 117
+                                                        l113 110 -3 -634 -3 -635 -24 -45 c-32 -61 -86 -116 -146 -148 l-50 -27 -1435
+                                                        -3 c-1594 -3 -1478 -7 -1575 66 -36 27 -60 56 -85 106 l-35 69 0 2097 0 2097
+                                                        35 69 c25 50 49 79 85 106 93 71 17 66 1198 67 l1067 1 0 -365z m510 -100
+                                                        l345 -345 -309 0 -308 0 -39 39 -39 39 0 306 c0 168 1 306 3 306 1 0 157 -155
+                                                        347 -345z m1558 -909 c15 -8 64 -52 109 -98 116 -120 120 -156 24 -259 l-50
+                                                        -54 -153 152 -153 153 45 46 c68 70 123 89 178 60z m-905 -978 l-668 -668 -47
+                                                        47 -48 48 667 667 668 668 47 -47 48 -48 -667 -667z m829 505 l48 -48 -662
+                                                        -662 c-365 -365 -668 -663 -673 -663 -6 0 -31 20 -55 45 l-45 45 665 665 c366
+                                                        366 667 665 670 665 2 0 26 -21 52 -47z m-1514 -1450 c-35 -6 -88 -15 -119
+                                                        -19 l-56 -6 18 108 c10 60 19 113 19 119 0 5 45 -35 100 -90 l101 -100 -63
+                                                        -12z" />
+                                                            <path d="M802 4337 c-28 -30 -29 -80 -2 -107 20 -20 33 -20 715 -20 682 0 695
+                                                        0 715 20 28 28 26 81 -3 108 l-23 22 -690 0 -691 0 -21 -23z" />
+                                                            <path
+                                                                d="M823 3780 c-47 -19 -57 -87 -18 -125 l24 -25 684 0 c677 0 685 0 711
+                                                        21 32 25 35 75 7 110 l-19 24 -684 2 c-382 1 -693 -2 -705 -7z" />
+                                                            <path
+                                                                d="M802 3187 c-29 -31 -29 -77 1 -105 l23 -22 1088 0 1087 0 26 26 c20
+                                                        20 24 31 19 57 -3 18 -16 40 -27 50 -20 16 -88 17 -1108 17 l-1088 0 -21 -23z" />
+                                                            <path
+                                                                d="M805 2615 c-16 -15 -25 -36 -25 -55 0 -19 9 -40 25 -55 l24 -25 1081
+                                                        0 1082 0 29 29 c37 37 37 65 0 102 l-29 29 -1082 0 -1081 0 -24 -25z" />
+                                                            <path d="M802 2037 c-29 -31 -29 -77 1 -105 l23 -22 840 0 841 0 21 23 c29 31
+                                                        29 77 -1 105 l-23 22 -840 0 -841 0 -21 -23z" />
+                                                            <path d="M805 1465 c-30 -29 -32 -74 -6 -106 l19 -24 824 -3 c452 -1 833 0
+                                                        846 3 61 15 82 86 37 130 l-24 25 -836 0 -836 0 -24 -25z" />
+                                                        </g>
+                                                    </svg>
+                                                    Modifier
                                                 </a>
                                             @endif
-                                        </td> --}}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-
-                    {{-- <div class="pagination">
-                        @if ($cheques->hasPages())
-                            <div class="pagination-links">
-                                @if ($cheques->onFirstPage())
-                                    <span class="disabled" aria-disabled="true">
-                                        <span class="page-link">&laquo; Précédent</span>
-                                    </span>
-                                @else
-                                    <a href="{{ $cheques->previousPageUrl() }}" class="page-link"
-                                        rel="prev">&laquo; Précédent</a>
-                                @endif
-                                @foreach ($cheques->getUrlRange(1, $cheques->lastPage()) as $page => $url)
-                                    @if ($page == $cheques->currentPage())
-                                        <span class="active">{{ $page }}</span>
-                                    @else
-                                        <a href="{{ $url }}" class="page-link">{{ $page }}</a>
-                                    @endif
-                                @endforeach
-                                @if ($cheques->hasMorePages())
-                                    <a href="{{ $cheques->nextPageUrl() }}" class="page-link" rel="next">Suivant
-                                        &raquo;</a>
-                                @else
-                                    <span class="disabled" aria-disabled="true">
-                                        <span class="page-link">Suivant &raquo;</span>
-                                    </span>
-                                @endif
-                            </div>
-                        @endif
-                    </div> --}}
 
                     <div class="pagination">
                         @if ($cheques->hasPages())

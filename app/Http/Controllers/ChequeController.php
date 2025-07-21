@@ -381,4 +381,17 @@ class ChequeController extends Controller
         Logs::saveLog($module, $action);
         return redirect()->route('listCheques')->with('success', 'Chèque refuse avec succès');
     }
+
+
+    public function editer($id)
+    {
+        //
+
+        $entreprises = Entreprise::All();
+        // dd($entreprises);
+        $module = "Module Cheque ";
+        $action = "A  consulter la page enregistrement des cheques ou virements ";
+        Logs::saveLog($module, $action);
+        return view('dashboards.cheques.create', compact('entreprises'));
+    }
 }

@@ -41,12 +41,13 @@ Route::controller(HomeController::class)->group(function () {
     // Route::get('/home', 'index')->name('home');
 
     //retour paiement
-    Route::get('/retourPaiementResultat/{codePaiement}','retourPaiement');
+    Route::get('/retourPaiementResultat/{codePaiement}','retourPaiement')->name('passageCodeRetourHub');
     Route::get('/voirRecuPaiement/{codePaiement}','recuPaiement')->name('recuPay');
 
 
     Route::get('/listeTaxeApi/{id}','lisEntreTaxeId');
 });
+Route::get('/payments/stats/{period}', [DashboardController::class, 'getPaymentStats']);
 
 // route des paiements
 Route::controller(PaiementInitialController::class)->group(function () {
@@ -128,6 +129,8 @@ Route::middleware('auth')->group(function () {
 
 
             Route::get('/listesdePaiementEffectuel/{id}', 'mesrecus')->name('espaceClient.mesrecus');
+            Route::get('/editChequeOuVirement/{id}', 'editChequeOuVirement')->name('espaceClient.editChequeOuVirement');
+            Route::post('/chequeEnregistreUdapte/{id}', 'chequEnregistreUdapte')->name('espaceClient.chequeEnregistreUdapte');
         });
     });
 
