@@ -2,6 +2,8 @@
 @push('css')
     <!-- Application vendor css url -->
     <link rel="stylesheet" href="{{ asset('assets/cssbundle/dataTables.min.css') }}">
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endpush
 @section('content')
     <div class="row g-3">
@@ -27,10 +29,18 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="card-title m-0">Liste des paiements</h6>
+                    <h6 class="card-title m-0">Liste des cheques</h6>
+
                     <div>
+                        <a href="{{ route('cheque.export.excel') }}" class="btn btn-outline-success me-2">
+                            <i class="fas fa-file-excel me-1"></i> Export Excel
+                        </a>
+                        <a href="{{ route('cheque.export.pdf') }}" class="btn btn-outline-danger me-2">
+                            <i class="fas fa-file-pdf me-1"></i> Export PDF
+                        </a>
+
                         <a href="{{ route('cheque.create') }}" class="btn btn-success">
-                            <i class="fas fa-file-import me-2"></i>Enregistre un chéque ou virement
+                            <i class="fas fa-save me-2"></i>Enregistre un chéque ou virement
                         </a>
                     </div>
                 </div>

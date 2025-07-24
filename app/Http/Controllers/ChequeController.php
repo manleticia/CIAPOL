@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use PDF;
 use Carbon\Carbon;
 use App\Models\Logs;
 use App\Models\Cheque;
 use App\Models\Paiement;
 use App\Models\Entreprise;
 use Illuminate\Http\Request;
+use App\Exports\ChequeExport;
 use App\Models\TaxeEntreprise;
 use App\Models\PaiementInitial;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Requests\StoreChequeRequest;
 
 use App\Http\Requests\UpdateChequeRequest;
@@ -450,5 +452,21 @@ class ChequeController extends Controller
         $action = " l'administrateur ayant l'id : $idAdmin ,A supprimer le cheque ou virement ayant l'id : $id";
         Logs::saveLog($module, $action);
         return redirect()->route('listCheques')->with('success', 'Chèque ou Virement supprimé avec succès');
+    }
+
+
+
+    public function exportExcel()
+    {
+        return Excel::download(new ChequeExport, 'cheques.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        $entreprises = Cheque::all();
+        $pas = 3;
+        $libelle = 'liste des Cheques et Virement';
+        $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises', 'libelle', 'pas'));
+        return $pdf->download('cheque et virement.pdf');
     }
 }

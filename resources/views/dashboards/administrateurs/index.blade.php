@@ -2,6 +2,7 @@
 @push('css')
     <!-- Application vendor css url -->
     <link rel="stylesheet" href="{{ asset('assets/cssbundle/dataTables.min.css') }}">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endpush
 @section('content')
     <div class="row g-3">
@@ -29,6 +30,12 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title m-0">Liste des administrateurs</h6>
                     <div class="dropdown morphing scale-left">
+                         <a href="{{ route('cheque.export.excel') }}" class="btn btn-outline-success me-2">
+                            <i class="fas fa-file-excel me-1"></i> Export Excel
+                        </a>
+                        <a href="{{ route('cheque.export.pdf') }}" class="btn btn-outline-danger me-2">
+                            <i class="fas fa-file-pdf me-1"></i> Export PDF
+                        </a>
                         <a href="#" class="card-fullscreen" data-bs-toggle="tooltip" title="Card Full-Screen"><i
                                 class="icon-size-fullscreen"></i></a>
                         @if ($ver->id_parains == 0 || $ver->id_parains == 1)
@@ -36,6 +43,8 @@
                                 administrateur</a>
                         @endif
                     </div>
+
+
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

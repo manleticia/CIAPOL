@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use PDF;
 use App\Models\Logs;
 use App\Models\User;
 use App\Models\Inscrit;
@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AdministrateursExport;
 use App\Http\Requests\StoreAdministrateurRequest;
 
 use App\Http\Requests\UpdateAdministrateurRequest;
@@ -704,4 +706,9 @@ class AdministrateurController extends Controller
             return view('dashboards.errors.index', compact('code', 'mess'));
         }
     }
+
+
+
+
+
 }

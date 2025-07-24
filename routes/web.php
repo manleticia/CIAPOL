@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Cheque;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ChequeController;
@@ -55,7 +56,7 @@ Route::controller(PaiementInitialController::class)->group(function () {
 });
 
 Route::controller(AdministrateurController::class)->group(function(){
-        Route::get('/creattionAccesAdministrateur/{codeInscription}', 'validationAccesAdmin')->name('accesAdminCreat');
+        Route::get('/creationAccesAdministrateur/{codeInscription}', 'validationAccesAdmin')->name('accesAdminCreat');
         Route::post('/traitementAccesAdministrateurC','traitAccesAdministrateur')->name('adminAccesTrait');
 
         Route::get('/creattionAccesAdministrateur/{codeInscription}', 'validationAccesRein')->name('reinitaccesAdmin');
@@ -122,6 +123,17 @@ Route::middleware('auth')->group(function () {
 
             Route::post('/desactiverCheque/{id}','suppressionCheque')->name('cheque.desactive');
         });
+
+
+        Route::get('/entreprises/export/excel', [EntrepriseController::class, 'exportExcel'])->name('entreprises.export.excel');
+        Route::get('/entreprises/export/pdf', [EntrepriseController::class, 'exportPdf'])->name('entreprises.export.pdf');
+
+        Route::get('/paiement/export/excel', [PaiementInitialController::class, 'exportExcel'])->name('paiement.export.excel');
+        Route::get('/paiement/export/pdf', [PaiementInitialController::class, 'exportPdf'])->name('paiement.export.pdf');
+
+        Route::get('/cheque/export/excel', [ChequeController::class, 'exportExcel'])->name('cheque.export.excel');
+        Route::get('/cheque/export/pdf', [ChequeController::class, 'exportPdf'])->name('cheque.export.pdf');
+
     });
 
     // les routes de l'espace client7

@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use PDF;
 use Carbon\Carbon;
 use App\Models\Logs;
 use App\Models\Entreprise;
 use Illuminate\Http\Request;
 use App\Models\TaxeEntreprise;
 use App\Imports\EntrepriseImport;
+use App\Exports\EntreprisesExport;
 // use App\Imports\EntrepriseImport;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 use Maatwebsite\Excel\Facades\Excel;
+
 use App\Http\Requests\StoreEntrepriseRequest;
 use App\Http\Requests\UpdateEntrepriseRequest;
 
@@ -279,5 +281,23 @@ class EntrepriseController extends Controller
             }
         }
         return true;
+    }
+
+
+
+
+
+    public function exportExcel()
+    {
+        return Excel::download(new EntreprisesExport, 'entreprises.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        $entreprises = Entreprise::all();
+        $pas = 1;
+        $libelle = 'liste des Entreprises';
+        $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises','libelle','pas'));
+        return $pdf->download('entreprise.pdf');
     }
 }

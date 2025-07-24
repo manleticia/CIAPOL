@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use PDF;
 use App\Models\Logs;
 use App\Models\Paiement;
 use Illuminate\Http\Request;
@@ -10,8 +11,9 @@ use App\Models\PaiementInitial;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-
 use Illuminate\Support\Facades\Http;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PaiementInitialExport;
 use App\Http\Requests\StorePaiementInitialRequest;
 use App\Http\Requests\UpdatePaiementInitialRequest;
 
@@ -294,5 +296,23 @@ class PaiementInitialController extends Controller
         }
 
         return 'Ok';
+    }
+
+
+
+
+     public function exportExcel()
+    {
+        return Excel::download(new PaiementInitialExport, 'paiement.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        $entreprises = PaiementInitial::where('status', 1)
+            ->get();
+        $pas = 2;
+        $libelle = 'liste des Paiements';
+        $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises','libelle','pas'));
+        return $pdf->download('paiement.pdf');
     }
 }
