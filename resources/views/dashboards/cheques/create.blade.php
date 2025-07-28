@@ -31,6 +31,14 @@
         }
     </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+
+
+     <!-- CSS de Select2 -->
+    {{-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Toastr CSS (version spécifique) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" rel="stylesheet"> --}}
 @endpush
 @section('content')
     <div class="row g-3">
@@ -260,7 +268,7 @@
 
                             <div class="row mt-4">
                                 <div class="col-12 text-center">
-                                    <a href="{{ route('listCheques') }}"  class="btn btn-secondary mx-2">Annuler</a>
+                                    <a href="{{ route('listCheques') }}" class="btn btn-secondary mx-2">Annuler</a>
                                     <button type="submit" id="add_admin_btn"
                                         class="btn btn-primary mx-2">Enregistrer</button>
                                 </div>
@@ -358,12 +366,14 @@
             });
         });
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Sélectionnez une option",
-                allowClear: true
-            });
+            // $('.select2').select2({
+            //     placeholder: "Sélectionnez une option",
+            //     allowClear: true
+            // });
 
             $('#entreprise_id').on('change', function() {
                 const messageInput = document.getElementById("feedback");
@@ -427,7 +437,7 @@
                             $.each(taxesData, function(id, taxe) {
                                 if (id !==
                                     '00'
-                                    ) { // On ajoute pas '00' car déjà ajouté comme option par défaut
+                                ) { // On ajoute pas '00' car déjà ajouté comme option par défaut
                                     taxeSelect.append(new Option(
                                         `${taxe.periode} - ${taxe.montant.toFixed(2)} FCFA`,
                                         id,
@@ -481,4 +491,5 @@
             });
         });
     </script>
+
 @endpush

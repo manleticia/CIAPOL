@@ -296,12 +296,14 @@ class EntrepriseController extends Controller
     public function exportPdf()
     {
         ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '300'); 
+        ini_set('max_execution_time', '600');
 
         $entreprises = Entreprise::all();
         $pas = 1;
         $libelle = 'liste des Entreprises';
-        $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises', 'libelle', 'pas'));
-        return $pdf->download('entreprise.pdf');
+        // $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises', 'libelle', 'pas'));
+        // return $pdf->download('entreprise.pdf');
+        return view('dashboards.entreprise.pdf', compact('entreprises', 'libelle', 'pas'));
+        // return $pdf->download('entreprise.pdf');
     }
 }

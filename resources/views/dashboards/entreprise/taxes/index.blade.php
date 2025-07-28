@@ -36,7 +36,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="entreprisesTable" class="table table-hover align-middle mb-0" style="width:100%">
+                        <table id="example" class="table table-hover align-middle mb-0" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>N</th>

@@ -38,7 +38,7 @@
                         <a href="{{ route('entreprises.export.excel') }}" class="btn btn-outline-success me-2">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
-                        <a href="{{ route('entreprises.export.pdf') }}" class="btn btn-outline-danger me-2">
+                        <a href="{{ route('entreprises.export.pdf') }}" target="_target" class="btn btn-outline-danger me-2">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
                         </a>
                         <a href="{{ route('entreprises.import') }}" class="btn btn-success">
@@ -311,3 +311,9 @@
         });
     </script>
 @endpush
+
+
+
+
+
+

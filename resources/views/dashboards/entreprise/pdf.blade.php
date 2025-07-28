@@ -123,7 +123,7 @@
                         <td>{{ $entreprise->telephone }}</td>
                         <td>{{ $entreprise->telephone_2 }}</td>
                         <td>
-                            <span class="badge bg-{{ $entreprise->status == 1? 'success' : 'danger' }}">
+                            <span class="badge bg-{{ $entreprise->status == 1 ? 'success' : 'danger' }}">
                                 {{ $entreprise->status == 1 ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
@@ -222,6 +222,17 @@
     <div class="footer">
         Généré le {{ date('d/m/Y à H:i') }} - © CIAPOL
     </div>
+
+
+    @if ($pas == 1)
+        <script>
+            window.onload = function() {
+                window.print();
+            };
+        </script>
+    @endif
 </body>
+
+
 
 </html>
