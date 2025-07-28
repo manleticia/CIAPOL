@@ -30,12 +30,12 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title m-0">Liste des administrateurs</h6>
                     <div class="dropdown morphing scale-left">
-                         <a href="{{ route('cheque.export.excel') }}" class="btn btn-outline-success me-2">
+                         {{-- <a href="{{ route('cheque.export.excel') }}" class="btn btn-outline-success me-2">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
                         <a href="{{ route('cheque.export.pdf') }}" class="btn btn-outline-danger me-2">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
-                        </a>
+                        </a> --}}
                         <a href="#" class="card-fullscreen" data-bs-toggle="tooltip" title="Card Full-Screen"><i
                                 class="icon-size-fullscreen"></i></a>
                         @if ($ver->id_parains == 0 || $ver->id_parains == 1)
@@ -301,9 +301,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-
-
                                     <!--end modal -->
                                 @endforeach
                             </tbody>

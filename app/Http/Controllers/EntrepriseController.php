@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use PDF;
 use Carbon\Carbon;
 use App\Models\Logs;
@@ -294,10 +295,13 @@ class EntrepriseController extends Controller
 
     public function exportPdf()
     {
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '300'); 
+
         $entreprises = Entreprise::all();
         $pas = 1;
         $libelle = 'liste des Entreprises';
-        $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises','libelle','pas'));
+        $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises', 'libelle', 'pas'));
         return $pdf->download('entreprise.pdf');
     }
 }

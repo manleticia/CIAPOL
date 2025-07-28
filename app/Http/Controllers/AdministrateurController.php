@@ -382,8 +382,8 @@ class AdministrateurController extends Controller
             //code...
             DB::beginTransaction();
             $administrateur = Administrateur::find($id);
-            $userId = $administrateur->user_id;
-            $user = User::findOrFail($userId);
+            // $userId = $administrateur->user_id;
+            // $user = User::findOrFail($userId);
 
             if ($administrateur->lien_photo) {
                 delete_file($administrateur->lien_photo);

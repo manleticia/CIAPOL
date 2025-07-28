@@ -123,8 +123,8 @@
                         <td>{{ $entreprise->telephone }}</td>
                         <td>{{ $entreprise->telephone_2 }}</td>
                         <td>
-                            <span class="badge bg-{{ $entreprise->status ? 'success' : 'danger' }}">
-                                {{ $entreprise->status ? 'Active' : 'Inactive' }}
+                            <span class="badge bg-{{ $entreprise->status == 1? 'success' : 'danger' }}">
+                                {{ $entreprise->status == 1 ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
                     </tr>
@@ -160,8 +160,8 @@
                         <td>{{ $paiement->contactPaiement ?? 'N/A' }}</td>
                         <td>{{ $paiement->datePaiement ?? 'N/A' }}</td>
                         <td>
-                            <span class="badge bg-{{ $paiement->status ? 'success' : 'danger' }}">
-                                {{ $paiement->status ? 'Active' : 'Inactive' }}
+                            <span class="badge bg-{{ $paiement->status == 1 ? 'success' : 'danger' }}">
+                                {{ $paiement->status == 1 ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
                     </tr>
