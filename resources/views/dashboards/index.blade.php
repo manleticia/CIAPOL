@@ -126,7 +126,6 @@
                                 <th class="text-center">Numéro de Paiement</th>
                                 <th class="text-center">Date de Paiement</th>
                                 <th class="text-center">Statut</th>
-                                {{-- <th class="text-center">Actions</th> --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -135,35 +134,21 @@
                                     <td>{{ $paiement->entreprise->raison_sociale ?? 'N/A' }}</td>
                                     <td>{{ $paiement->taxeEntreprise->periode ?? 'N/A' }}</td>
                                     <td>{{ $paiement->referencePaiement ?? ($paiement->codePaiement ?? 'N/A') }}</td>
-                                    <td class="text-end">{{ number_format($paiement->montant ?? 0, 0, ',', ' ') }} F CFA
+                                    <td class="text-end">
+                                        {{ number_format($paiement->montant ?? 0, 0, ',', ' ') }} F CFA
                                     </td>
                                     <td>{{ $paiement->moyenPaiement ?? 'N/A' }}</td>
                                     <td>{{ $paiement->contactPaiement ?? 'N/A' }}</td>
-                                    <td>{{ $paiement->datePaiement ? \Carbon\Carbon::parse($paiement->datePaiement)->format('d/m/Y') : 'N/A' }}
+                                    <td>
+                                        {{ $paiement->datePaiement ? \Carbon\Carbon::parse($paiement->datePaiement)->format('d/m/Y') : 'N/A' }}
                                     </td>
-                                    <td class="text-center">
-                                        <span
-                                            class="badge rounded-pill bg-{{ $paiement->status == 1 ? 'success' : 'danger' }}">
-                                            {{ $paiement->status == 1 ? 'Validé' : 'En attente' }}
-                                        </span>
-                                    </td>
-                                    {{-- <td class="text-center">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <a href="{{ route('recuPay', $paiement->codePaiement) }}"
-                                                class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
-                                                title="Télécharger le reçu">
-                                                <i class="fas fa-receipt"></i>
-                                            </a>
+                                        <td class="text-center">
+                                            <span
+                                                class="badge rounded-pill bg-{{ $paiement->status == 1 ? 'success' : 'danger' }}">
+                                                {{ $paiement->status == 1 ? 'Validé' : 'En attente' }}
+                                            </span>
+                                        </td>
 
-                                            @if ($paiement->status != 1)
-                                                <button class="btn btn-sm btn-outline-success valider-paiement"
-                                                    data-id="{{ $paiement->id }}" data-bs-toggle="tooltip"
-                                                    title="Valider le paiement">
-                                                    <i class="fas fa-check-circle"></i>
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </td> --}}
                                 </tr>
                             @endforeach
                             @if (empty($paiements))
@@ -180,7 +165,7 @@
                                     <th colspan="3" class="text-end">Total :</th>
                                     <th class="text-end">{{ number_format($paiements->sum('montant'), 0, ',', ' ') }} F CFA
                                     </th>
-                                    <th colspan="5"></th>
+                                    <th colspan="4"></th>
                                 </tr>
                             </tfoot>
                         @endif

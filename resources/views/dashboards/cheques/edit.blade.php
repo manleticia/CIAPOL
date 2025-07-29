@@ -498,10 +498,10 @@
         //     });
         // });
         $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Sélectionnez une option",
-                allowClear: true
-            });
+            // $('.select2').select2({
+            //     placeholder: "Sélectionnez une option",
+            //     allowClear: true
+            // });
 
             // Initialiser avec l'entreprise déjà sélectionnée si en mode édition
             const initialEntrepriseId = @json($cheque->entreprise_id ?? '');
