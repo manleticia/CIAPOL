@@ -139,6 +139,10 @@
                                             {{ old('NaturePaiement', $cheque->NaturePaiement) == 'VIREMENT' ? 'selected' : '' }}>
                                             Virement
                                         </option>
+                                        <option value="ESPECE"
+                                            {{ old('NaturePaiement', $cheque->NaturePaiement) == 'ESPECE' ? 'selected' : '' }}>
+                                            Espece
+                                        </option>
                                     </select>
                                     @error('NaturePaiement')
                                         <span class="invalid-feedback" role="alert">
@@ -164,7 +168,7 @@
 
                             </div>
 
-                            <div class="col-lg-4 col-md-12">
+                            <div class="col-lg-4 col-md-12" id="banklis">
                                 <div class="form-group">
                                     <label for="banque">Banque émettrice <span
                                             class="text-danger fw-bold">*</span></label>
@@ -235,7 +239,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-12">
+                            <div class="col-lg-4 col-md-12" id="titu">
                                 <div class="form-group">
                                     <label for="titulaire">Nom du titulaire du compte <span
                                             class="text-danger fw-bold">*</span></label>
@@ -294,24 +298,48 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const natureSelect = document.getElementById('NaturePaiement');
+            const titula = document.getElementById('titu');
+            const bank = document.getElementById('banklis');
+            const valueBanq = document.getElementById('banque-select');
+            const valueTitul = document.getElementById('titulaire');
+
             const numeroLabel = document.querySelector('label[for="numero_cheque"]');
             const numeroInput = document.getElementById('numero_cheque');
             const formNote = document.querySelector('.form-note');
 
             natureSelect.addEventListener('change', function() {
                 if (this.value === 'CHEQUE') {
+                    titula.style.display = 'block';
+                    bank.style.display = 'block';
                     numeroLabel.textContent = 'Numéro du chèque *';
                     numeroInput.placeholder = 'CHQ-2023-001';
                     formNote.textContent = 'Ex: CHQ-2023-001 ou 2023/CHQ/001';
                     numeroInput.pattern = "[A-Za-z0-9-]+";
                     numeroInput.title = "Caractères alphanumériques et tirets uniquement";
                 } else if (this.value === 'VIREMENT') {
+                    titula.style.display = 'block';
+                    bank.style.display = 'block';
                     numeroLabel.textContent = 'Numéro de virement *';
                     numeroInput.placeholder = 'VIR-2023-001';
                     formNote.textContent = 'Ex: VIR-2023-001 ou REF/VIREMENT/2023';
                     numeroInput.pattern = "[A-Za-z0-9-/]+";
                     numeroInput.title = "Caractères alphanumériques, tirets et slashs uniquement";
+
+                } else if (this.value === 'ESPECE') {
+                    valueTitul.value = '';
+                    titula.style.display = 'none';
+                    valueBanq.selectedIndex = '';
+                    bank.style.display = 'none';
+                    numeroLabel.textContent = 'Reference de Paiement *';
+                    numeroInput.placeholder = 'REF-2023-001';
+                    formNote.textContent = 'Ex: REf-2023-001 ou REF/VIREMENT/2023';
+                    numeroInput.pattern = "[A-Za-z0-9-/]+";
+                    numeroInput.title = "Caractères alphanumériques, tirets et slashs uniquement";
+
+
                 } else {
+                    titula.style.display = 'block';
+                    bank.style.display = 'block';
                     numeroLabel.textContent = 'Numéro';
                     numeroInput.placeholder = '';
                     formNote.textContent = '';
@@ -328,6 +356,7 @@
             const banqueSelect = document.getElementById('banque-select');
             const autreBanqueContainer = document.getElementById('autre-banque-container');
             const autreBanqueInput = document.getElementById('autre-banque');
+
             function toggleAutreBanque() {
                 if (banqueSelect.value === 'AUTRE') {
                     autreBanqueContainer.style.display = 'block';

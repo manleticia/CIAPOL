@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use PDF;
 use App\Models\Logs;
 use App\Models\User;
@@ -376,35 +377,18 @@ class AdministrateurController extends Controller
 
     public function desactiveAdmin($id)
     {
-        //    dd($id);
-
         try {
-            //code...
             DB::beginTransaction();
             $administrateur = Administrateur::find($id);
-            // $userId = $administrateur->user_id;
-            // $user = User::findOrFail($userId);
-
-            if ($administrateur->lien_photo) {
-                delete_file($administrateur->lien_photo);
-            }
-
             $administrateur->status = 2;
             $administrateur->save();
-            // Supprimer l'administrateur
-            // $administrateur->delete();
-            // $user->delete();
-
             DB::commit();
             $module = "Module Administrateur ";
             $action = "A desactiver l'administrateur id = $id: ";
             Logs::saveLog($module, $action);
             return redirect()->back();
         } catch (\Exception $e) {
-            //throw $th;
-            // dd($th);
             DB::rollback();
-
             Log::error('Erreur interne du serveur: ' . $e->getMessage());
             $module = "Module Administrateur ";
             $action = 'Erreur lors de la desactivation d\'un administrateur : ' . $e->getMessage();
@@ -416,34 +400,19 @@ class AdministrateurController extends Controller
     }
     public function reactiveAdmin($id)
     {
-        //    dd($id);
-
         try {
-            //code...
             DB::beginTransaction();
             $administrateur = Administrateur::find($id);
             $userId = $administrateur->user_id;
-            $user = User::findOrFail($userId);
-            // if ($administrateur->lien_photo) {
-            //     delete_file($administrateur->lien_photo);
-            // }
-
             $administrateur->status = 1;
             $administrateur->save();
-            // Supprimer l'administrateur
-            // $administrateur->delete();
-            // $user->delete();
-
             DB::commit();
             $module = "Module Administrateur ";
             $action = "A reactivier  l'administrateur id = $id: ";
             Logs::saveLog($module, $action);
             return redirect()->back();
         } catch (\Exception $e) {
-            //throw $th;
-            // dd($th);
             DB::rollback();
-
             Log::error('Erreur interne du serveur: ' . $e->getMessage());
             $module = "Module Administrateur ";
             $action = 'Erreur lors de la reactivation  d\'un administrateur : ' . $e->getMessage();
@@ -453,8 +422,6 @@ class AdministrateurController extends Controller
             return view('dashboards.errors.index', compact('code', 'mess'));
         }
     }
-
-
     // page d'envouer creation acces administrateur
     public function validationAccesAdmin($codeInscription)
     {
@@ -706,9 +673,4 @@ class AdministrateurController extends Controller
             return view('dashboards.errors.index', compact('code', 'mess'));
         }
     }
-
-
-
-
-
 }

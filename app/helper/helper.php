@@ -145,3 +145,36 @@ function dateDuJourEnFrancais()
 
     return ucfirst(strftime('%A %d %B %Y'));
 }
+function ACTIF()
+{
+    return 1;
+}
+function ENATTENTE()
+{
+    return 2;
+}
+function ECHOUE()
+{
+    return 3;
+}
+function DESACTIVE()
+{
+    return 4;
+}
+function ANNUELMANUEL()
+{
+    return 5;
+}
+
+
+// Fonction pour convertir le timestamp en date et heure formatée
+function convertir_date($timestamp)
+{
+    try {
+        $date = str_replace(array("/", "-"), "", $timestamp);
+        $dt = \Carbon\Carbon::createFromFormat('Ymd', $date);
+        return $dt->format('d/m/Y');
+    } catch (\Exception $e) {
+        return $timestamp;
+    }
+}

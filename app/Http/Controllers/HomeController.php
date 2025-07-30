@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Requests\AdministrateurLoginRequest;
 
 class HomeController extends Controller
@@ -160,7 +161,7 @@ class HomeController extends Controller
     public function traitAcceEntreprise(Request $request)
     {
 
-            //    dd($request->all());
+        //    dd($request->all());
         $request->validate([
             'entreprise_id' => 'required|integer|exists:entreprises,id',
             'inscrit_id' => 'required|integer|exists:inscrits,id',
@@ -344,13 +345,22 @@ class HomeController extends Controller
     // recu de paiement
     public function recuPaiement($codePaiement)
     {
-        $paiement = PaiementInitial::where('codePaiement', $codePaiement)->first();
+        $paiement = PaiementInitial::where('codePaiement', $codePaiement)
+                                    ->where('status',1)
+                                    ->first();
+        if (empty($paiement)) {
+            $mess = "Erreur paiement inexistant veuillez contacter les administrateur avec ce code : $codePaiement ";
+            $code = 405;
+            return view('dashboards.errors.index', compact('code', 'mess'));
+        }
         $infos = Entreprise::where('id', $paiement->entreprise_id)->first();
         // dd($codePaiement,$paiement,$infos);
+
+        $code = route('recuPay', ['codePaiement' => $codePaiement]);
         $module = "Module Paiement  ";
         $action = "A consulter le recu d'un paiement   ";
         Logs::saveLog($module, $action);
-        return view('vitrines.recu', compact('infos', 'paiement'));
+        return view('vitrines.recu', compact('infos', 'paiement', 'code'));
     }
     // api qui recuperer la lists des taxEntreprise en fonction de l'entreprise selectionne
     public function lisEntreTaxeId($id)
@@ -370,7 +380,7 @@ class HomeController extends Controller
                 ->where('status', 2)
                 ->get();
 
-            if (count($taxes)>0) {
+            if (count($taxes) > 0) {
                 $result["status"] = 200;
                 $result["message"] = "succes";
                 $result["data"] = $taxes;
@@ -380,12 +390,10 @@ class HomeController extends Controller
                 $result["message"] = 'Aucune taxe trouvée pour cette entreprise.';
                 return $result;
             }
-
         } catch (\Throwable $th) {
             $result["status"] = 500;
             $result["message"] = 'Une erreur inattendue s\'est produite. ERR: ' . $th->getMessage();
             return $result;
         }
-
     }
 }

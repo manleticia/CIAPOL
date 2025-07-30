@@ -1,4 +1,4 @@
-@extends('layouts.dashboard', ['title' => $title ?? 'Liste des entreprises'])
+@extends('layouts.dashboard', ['title' => $title ?? 'Formulaire enregistrement transactions'])
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets/select2/select2.css') }}">
     <style>
@@ -32,13 +32,6 @@
     </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
 
-
-
-     <!-- CSS de Select2 -->
-    {{-- <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-
-    <!-- Toastr CSS (version spécifique) -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css" rel="stylesheet"> --}}
 @endpush
 @section('content')
     <div class="row g-3">
@@ -68,7 +61,7 @@
                 </div>
 
                 <div class="card-body">
-                    <h5 class="card-title">Information sur le chèque</h5>
+                    <h5 class="card-title">Information sur la transaction </h5>
 
                     <form action="{{ route('cheque.store') }}" method="POST" id="add_admin_form"
                         enctype="multipart/form-data" class="needs-validation" novalidate>
@@ -141,6 +134,8 @@
                                             Chèque</option>
                                         <option value="VIREMENT"
                                             {{ old('NaturePaiement') == 'VIREMENT' ? 'selected' : '' }}>Virement</option>
+                                        <option value="ESPECE" {{ old('NaturePaiement') == 'ESPECE' ? 'selected' : '' }}>Espece
+                                        </option>
                                     </select>
                                     @error('NaturePaiement')
                                         <span class="invalid-feedback" role="alert">
@@ -165,7 +160,7 @@
 
                             </div>
 
-                            <div class="col-lg-4 col-md-12">
+                            <div class="col-lg-4 col-md-12" id="banklis">
                                 <div class="form-group">
                                     <label for="banque">Banque émettrice <span
                                             class="text-danger fw-bold">*</span></label>
@@ -228,7 +223,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-12">
+                            <div class="col-lg-4 col-md-12" id="titu" >
                                 <div class="form-group">
                                     <label for="titulaire">Nom du titulaire du compte <span
                                             class="text-danger fw-bold">*</span></label>
@@ -287,24 +282,48 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const natureSelect = document.getElementById('NaturePaiement');
+            const titula = document.getElementById('titu');
+            const bank = document.getElementById('banklis');
+            const valueBanq = document.getElementById('banque-select');
+            const valueTitul = document.getElementById('titulaire');
+
             const numeroLabel = document.querySelector('label[for="numero_cheque"]');
             const numeroInput = document.getElementById('numero_cheque');
             const formNote = document.querySelector('.form-note');
 
             natureSelect.addEventListener('change', function() {
                 if (this.value === 'CHEQUE') {
+                    titula.style.display = 'block';
+                    bank.style.display = 'block';
                     numeroLabel.textContent = 'Numéro du chèque *';
                     numeroInput.placeholder = 'CHQ-2023-001';
                     formNote.textContent = 'Ex: CHQ-2023-001 ou 2023/CHQ/001';
                     numeroInput.pattern = "[A-Za-z0-9-]+";
                     numeroInput.title = "Caractères alphanumériques et tirets uniquement";
                 } else if (this.value === 'VIREMENT') {
+                    titula.style.display = 'block';
+                    bank.style.display = 'block';
                     numeroLabel.textContent = 'Numéro de virement *';
                     numeroInput.placeholder = 'VIR-2023-001';
                     formNote.textContent = 'Ex: VIR-2023-001 ou REF/VIREMENT/2023';
                     numeroInput.pattern = "[A-Za-z0-9-/]+";
                     numeroInput.title = "Caractères alphanumériques, tirets et slashs uniquement";
+
+                } else if (this.value === 'ESPECE') {
+                    valueTitul.value = '';
+                    titula.style.display = 'none';
+                    valueBanq.selectedIndex = '';
+                    bank.style.display = 'none';
+                    numeroLabel.textContent = 'Reference de Paiement *';
+                    numeroInput.placeholder = 'REF-2023-001';
+                    formNote.textContent = 'Ex: REf-2023-001 ou REF/VIREMENT/2023';
+                    numeroInput.pattern = "[A-Za-z0-9-/]+";
+                    numeroInput.title = "Caractères alphanumériques, tirets et slashs uniquement";
+
+
                 } else {
+                    titula.style.display = 'block';
+                    bank.style.display = 'block';
                     numeroLabel.textContent = 'Numéro';
                     numeroInput.placeholder = '';
                     formNote.textContent = '';
@@ -491,5 +510,4 @@
             });
         });
     </script>
-
 @endpush

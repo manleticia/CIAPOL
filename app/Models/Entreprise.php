@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Models\User;
 use App\Models\Cheque;
 use App\Models\Inscrit;
@@ -17,35 +18,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Entreprise extends Model
 {
-     use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable;
     protected $guarded = [];
 
-      public function taxeEntreprises(): HasOne
-    {
-        return $this->hasOne(TaxeEntreprise::class);
-    }
-      public function inscrits(): HasOne
+
+    public function inscrits(): HasOne
     {
         return $this->hasOne(Inscrit::class);
     }
-      public function paiements(): HasOne
+    public function paiements(): HasOne
     {
         return $this->hasOne(Paiement::class);
     }
-      public function paiementInitiales(): HasOne
+    public function paiementInitiales(): HasOne
     {
         return $this->hasOne(PaiementInitial::class);
     }
-      public function cheques(): HasOne
+    public function cheques(): HasOne
     {
         return $this->hasOne(Cheque::class);
     }
-      public function user(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
-        public function administrateur(): BelongsTo
+    public function administrateur(): BelongsTo
     {
         return $this->belongsTo(Administrateur::class);
+    }
+
+    public function taxesEntreprises()
+    {
+        return $this->hasMany(TaxeEntreprise::class);
     }
 }

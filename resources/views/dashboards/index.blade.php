@@ -60,6 +60,15 @@
                 </div>
             </div>
         </div>
+        <div class="col-4 mt-2" style="display: none">
+            <div class="card lift">
+                <div class="card-body py-xl-4 py-3">
+                    <span class="text-muted ">Nombre (chèques / virements / espèces) annuels <br> Apres Validation</span>
+                    <div><span class="fs-3 me-2"> {{ $paiImpay ?? '0' }}</span> </span></div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mb-3">

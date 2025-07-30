@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('NaturePaiement')->nullable();
             $table->text('motif_rejet')->nullable();
             $table->text('notes')->nullable();
-            $table->enum('status', [1, 2, 3])->default(2); // Statut du paiement (2: En attente, 1: succes, 3: echoue)
+            $table->enum('status', [1, 2, 3,4,5])->default(2); // Statut du paiement (2: En attente, 1: succes, 3: echoue ,4 desactiver, 5 Annuel Apres Validation )
             $table->softDeletes();
             $table->timestamps();
         });

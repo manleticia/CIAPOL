@@ -1,293 +1,349 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Reçu de Paiement</title>
     <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
         }
 
         .receipt-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 620px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
         .receipt-header {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .receipt-header h1 {
             margin: 0;
-            font-size: 24px;
-            color: #333;
+            font-size: 28px;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+            margin: 15px 0;
+            border: none;
+        }
+
+        .section-title {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title:after {
+            content: "";
+            display: block;
+            width: 50px;
+            height: 2px;
+            background: var(--secondary-color);
+            margin: 5px auto;
         }
 
         .receipt-details {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .receipt-details p {
-            margin: 0;
-            font-size: 18px;
-            color: #666;
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
         }
 
-        .receipt-details p strong {
-            color: #333;
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .detail-value {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .amount-highlight {
+            font-size: 20px;
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.05;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .watermark img {
+            width: 400px;
+            height: auto;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
 
         .receipt-footer {
             text-align: center;
-            margin-top: 20px;
-        }
-
-        .receipt-footer p {
-            margin: 0;
+            margin-top: 30px;
             font-size: 14px;
-            color: #999;
+            color: #666;
+            line-height: 1.6;
         }
 
-        span {
-            text-transform: uppercase;
+        .receipt-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
         }
 
-        .floating-button {
+        .receipt-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .print-button {
             position: fixed;
-            bottom: 20px;
-            left: 45%;
+            bottom: 30px;
+            left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            animation: bounce 2s infinite;
+            padding: 10px 25px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes bounce {
+        .print-button:hover {
+            background: #2980b9;
+            transform: translateX(-50%) translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
 
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateY(0);
-            }
+        .print-button:active {
+            transform: translateX(-50%) translateY(1px);
+        }
 
-            40% {
-                transform: translateY(-20px);
-            }
-
-            60% {
-                transform: translateY(-10px);
-            }
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            opacity: 0.8;
+            width: 80px;
+            height: 80px;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-color);
+            font-weight: bold;
+            transform: rotate(15deg);
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
         }
 
         @media print {
-            #printButton {
+            .print-button {
                 display: none;
+            }
+
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .receipt-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 20px;
+                max-width: 100%;
+                border-radius: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .receipt-container {
+                padding: 20px;
+                margin: 15px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .detail-value {
+                text-align: left;
+                margin-top: 3px;
             }
         }
     </style>
 </head>
 
 <body>
-
     <div class="receipt-container">
+        <div class="watermark">
+            <img src="{{ asset('photos/logo.png') }}" alt="Logo CIAPOL">
+        </div>
 
-        <center>
-            <p>------------------------------------------------------------------------------------------</p>
-        </center>
+        <div class="stamp">
+           <br> PAYÉ <br>{{ convertir_date( $paiement->datePaiement) ?? date('d/m/Y H:i') }}
+        </div>
+
         <div class="receipt-header">
-            <h1> Reçu de Paiement</h1>
+            <h1>Reçu de Paiement</h1>
         </div>
-        <center>
-            <p>------------------------------------------------------------------------------------------</p>
-        </center>
 
-        <div class="receipt-details mx-4 container">
-            <div class="row">
-                <div class="col-sm text-center mb-2 text-uppercase"><u>Informations</u> </div>
-            </div>
-            <div class="row pb-2">
-                <div class="col-7">
-                    <strong>
-                       Raison sociale : <br>
-                    </strong>
-                </div>
-                <div class="col-5">
-                    <span class="text-center  text-uppercase">
-                        <b> {{ $infos->raison_sociale ?? 'XXXXXXXXXXX' }} </b>
-                    </span>
-                </div>
+        <hr class="divider">
+
+        <div class="receipt-details">
+            <h3 class="section-title">Informations</h3>
+
+            <div class="detail-row">
+                <span class="detail-label">Raison sociale :</span>
+                <span class="detail-value text-uppercase">{{ $infos->raison_sociale ?? 'XXXXXXXXXXX' }}</span>
             </div>
 
-
-            <div class="row pb-2">
-                <div class="col-7">
-                    <strong>
-                        Telephone :
-
-                    </strong>
-                </div>
-                <div class="col-5">
-                    <span class="text-center">
-                        <b> {{ $infos->telephone ?? 'XXXXXXXXXXX' }}</b>
-                    </span>
-                </div>
+            <div class="detail-row">
+                <span class="detail-label">Téléphone :</span>
+                <span class="detail-value">{{ $infos->telephone ?? 'XXXXXXXXXXX' }}</span>
             </div>
+        </div>
 
-            <div class="row pb-2">
-                <div class="col-sm text-center text-uppercase"><u>Detail du paiement</u> </div>
-            </div>
-            <div class="row pb-2">
-                <div class="col-7">
-                    <strong>Référence de Paiement :</strong>
-                </div>
-                <div class="col-5">
-                    <span style="color:red;" class="text-center">
-                        @if (!empty($paiement->referencePaiement))
-                            {{ $paiement->referencePaiement ?? 'XXXXXXXXXXX' }}
-                        @else
-                            {{ $paiement->codePaiement ?? 'XXXXXXXXXXX' }}
-                        @endif
-                    </span>
+        <hr class="divider">
 
-                </div>
-            </div>
-            <div class="row pb-2">
-                <div class="col-7">
-                    <strong>Date de paiement :</strong>
-                </div>
-                <div class="col-5">
-                    <span class="text-center  text-uppercase">
-                        {{-- {{ formatDateTime($paiement->created_at) }} --}}
-                        {{ $paiement->datePaiement ?? 'jj/mm/aaaa' }}
-                    </span>
-                </div>
-            </div>
-            @if (!empty($paiement->contactPaiement))
-                <div class="row pb-4 pt-3">
-                    <div class="col-7">
-                        <strong>
-                            Contact de Paiement :
-                        </strong>
-                    </div>
-                    <div class="col-5">
-                        <span class="text-center">
-                            <b> {{ $paiement->contactPaiement ?? 'XXXXXXXXXXX' }} </b>
-                        </span>
-                    </div>
-                </div>
-            @endif
-            @if (!empty($paiement->moyenPaiement))
-                <div class="row pb-2">
-                    <div class="col-7">
-                        <strong>
-                            Moyen de paiement :
-                        </strong>
-                    </div>
-                    <div class="col-5">
-                        <span class="text-center">
-                            <b>{{ $paiement->moyenPaiement ?? 'XXXXXXXXXXX' }}</b>
-                        </span>
-                    </div>
-                </div>
-            @endif
-            <div class="row pb-2">
-                <div class="col-7">
-                    <strong>
-                        Montant :
-                    </strong>
-                </div>
-                <div class="col-5">
-                    <span class="text-center">
-                        <b>{{ $paiement->montant ?? '0' }} F CFA</b>
-                    </span>
-                </div>
-            </div>
+        <div class="receipt-details">
+            <h3 class="section-title">Détails du paiement</h3>
 
-            {{-- <div class="container"> --}}
-            <div class="row ">
-                <div class="col-6">
-                    <strong>Nature du paiement</strong>
-                    <br>
-                    @if ($paiement->entite)
-                        <span> {{ $paiement->entite ?? 'XXXXXXXXXXX' }}</span>
+            <div class="detail-row">
+                <span class="detail-label">Référence :</span>
+                <span class="detail-value" style="color: var(--accent-color);">
+                    @if (!empty($paiement->referencePaiement))
+                        {{ $paiement->referencePaiement ?? 'XXXXXXXXXXX' }}
+                    @else
+                        {{ $paiement->codePaiement ?? 'XXXXXXXXXXX' }}
                     @endif
-
-                </div>
-                <div class="col-6">
-                    <strong>Montant</strong>
-                    <br>
-                    {{ $paiement->montant ?? '0' }} F CFA
-
-
-                </div>
-
+                </span>
             </div>
-            {{-- </div> --}}
-        </div>
-        <center>
-            <p>------------------------------------------------------------------------------------------</p>
-        </center>
-        <p class="text-center">
-            ce reçu atteste que la somme mentionnée ci-dessus a été reçue pour
-            @if ($paiement->taxeEntreprise->periode)
-                <b>   <br> la facture {{ $paiement->taxeEntreprise->periode ?? 'Total' }}</b>
+
+            <div class="detail-row">
+                <span class="detail-label">Date de paiement :</span>
+                <span class="detail-value">{{ convertir_date($paiement->datePaiement) ?? date('d/m/Y H:i') }}</span>
+            </div>
+
+            @if (!empty($paiement->contactPaiement))
+            <div class="detail-row">
+                <span class="detail-label">Contact :</span>
+                <span class="detail-value">{{ $paiement->contactPaiement ?? 'XXXXXXXXXXX' }}</span>
+            </div>
             @endif
 
-        </p>
-        {{-- <div class="text-center ">
-            <span class="mt-3">
-                {{ QrCode::size(75)->generate($code) }}
-            </span>
-        </div> --}}
-        <center>
-            <p>------------------------------------------------------------------------------------------</p>
-        </center>
-        <div class="receipt-footer">
-            <p> <span class="text-center">Merci pour votre paiement.</span> <br>
-                CIAPOL , Abidjan Cocody Centre Château <br>
-                Abidjan B.P V 327 - Tel.:(225) 07 17 370 113
-                <br>
-                Email : <a href="Mailto:ciapol@gmail.com">ciapol@gmail.com </a>/
-                site web : <a href="https/www.ciapol.ci">www.ciapol.ci</a>
-            </p>
-            <p>Date de telechargement du recu:<strong>{{ date('d-m-Y H:i') }}</strong></p>
+            @if (!empty($paiement->moyenPaiement))
+            <div class="detail-row">
+                <span class="detail-label">Moyen de paiement :</span>
+                <span class="detail-value">{{ $paiement->moyenPaiement ?? 'XXXXXXXXXXX' }}</span>
+            </div>
+            @endif
+
+            <div class="detail-row">
+                <span class="detail-label">Montant :</span>
+                <span class="detail-value amount-highlight">{{ number_format($paiement->montant, 0, ',', ' ') }} F CFA</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Nature du paiement :</span>
+                <span class="detail-value">
+                    @if ($paiement->entite)
+                        {{ $paiement->entite ?? 'XXXXXXXXXXX' }}
+                    @endif
+                </span>
+            </div>
+
+            @if (!empty($paiement->taxeEntreprise->periode))
+            <div class="detail-row">
+                <span class="detail-label">Période :</span>
+                <span class="detail-value">{{ $paiement->taxeEntreprise->periode ?? 'Total' }}</span>
+            </div>
+            @endif
         </div>
 
+        <div class="qr-container">
+            {!! QrCode::size(120)->generate($code) !!}
+            <p class="mt-2">Code de vérification</p>
+        </div>
+
+        <hr class="divider">
+
+        <div class="receipt-footer">
+            <p>Ce reçu atteste que la somme mentionnée ci-dessus a été reçue.</p>
+            <p>
+                <strong>CIAPOL</strong> - Abidjan Cocody Centre Château<br>
+                Abidjan B.P V 327 - Tél.: (225) 07 17 370 113<br>
+                Email : <a href="mailto:ciapol@gmail.com">ciapol@gmail.com</a> -
+                Site web : <a href="https://www.ciapol.ci">www.ciapol.ci</a>
+            </p>
+            <p class="text-muted">Reçu généré le : {{ date('d/m/Y à H:i') }}</p>
+        </div>
     </div>
 
-    <div class="floating-button">
-        <a class="btn btn-primary" id="printButton">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                class="bi bi-cloud-arrow-down" viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                    d="M7.646 10.854a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 9.293V5.5a.5.5 0 0 0-1 0v3.793L6.354 8.146a.5.5 0 1 0-.708.708z" />
-                <path
-                    d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383m.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z" />
-            </svg>
-            Télécharger Reçu
-        </a>
-    </div>
+    <button class="print-button" id="printButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1"/>
+            <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
+        </svg>
+        Imprimer le reçu
+    </button>
+
     <script>
         document.getElementById('printButton').addEventListener('click', function() {
             window.print();
         });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

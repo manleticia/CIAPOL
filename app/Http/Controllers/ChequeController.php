@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use PDF;
 use Carbon\Carbon;
 use App\Models\Logs;
@@ -30,7 +31,8 @@ class ChequeController extends Controller
     public function index()
     {
         //7
-        $cheques = Cheque::all();
+        // $cheques = Cheque::all();
+        $cheques = Cheque::where('status', '!=', 5)->orderBy('created_at', 'desc')->get();
         $module = "Module Cheque ";
         $action = "A  consulter la liste des cheques ou Virements";
         Logs::saveLog($module, $action);
@@ -43,7 +45,10 @@ class ChequeController extends Controller
     public function create()
     {
         //
-        $entreprises = Entreprise::All();
+        // $entreprises = Entreprise::All();
+        $entreprises = Entreprise::whereHas('taxesEntreprises', function ($query) {
+            $query->where('status', 2);
+        })->get();
         // dd($entreprises);
         $module = "Module Cheque ";
         $action = "A  consulter la page enregistrement des cheques ou virements ";
@@ -144,7 +149,7 @@ class ChequeController extends Controller
             DB::beginTransaction();
             $cheque = Cheque::findOrFail($id);
             $entreprise = Entreprise::find($cheque->entreprise_id);
-            $email = $entreprise->user->email;
+            $email = $entreprise->user->email ?? null;
             // dd($cheque);
 
             $cheque->status = 1;
@@ -158,8 +163,8 @@ class ChequeController extends Controller
             $lieu = $cheque->autre_banque ?? $cheque->banque;
 
             $libelle = $cheque->taxe_entreprise_id
-                ? "Paiement par cheque du : " . $cheque->taxeEntreprise->periode
-                : "Paiement par cheque de Toutes les factures";
+                ? "Paiement par $cheque->NaturePaiement du : " . $cheque->taxeEntreprise->periode
+                : "Paiement par $cheque->NaturePaiement de Toutes les factures";
 
             // mise a jour des taxe Enteprise
             if (!empty($cheque->taxe_entreprise_id)) {
@@ -216,15 +221,17 @@ class ChequeController extends Controller
             ]);
             $paiement->save();
 
-            $montant = $paiementInitiale->montant;
-            $lien_plateforme = urlSite();
-            $nom_plateforme = "CIAPOL FACTURE";
-            $telephone_support = "(+225) 2722421619";
+            DB::commit();
+            if (!empty($email)) {
+                $montant = $paiementInitiale->montant;
+                $lien_plateforme = urlSite();
+                $nom_plateforme = "CIAPOL FACTURE";
+                $telephone_support = "(+225) 2722421619";
 
 
-            /// envoyer de mail a clients
-            $sujet = "Confirmation de réception de paiement";
-            $message = "
+                /// envoyer de mail a clients
+                $sujet = "Confirmation de réception de paiement";
+                $message = "
                 <p>Cher(e) " . $entreprise->raison_sociale . ",</p>
 
                 <p>Nous vous informons que nous avons bien reçu votre paiement par " . ($paiementInitiale->moyenPaiement == 'VIREMENT' ? 'virement' : 'chèque') . ".</p>
@@ -248,39 +255,39 @@ class ChequeController extends Controller
 
                 <p>Cordialement,<br>
                 L'équipe " . $nom_plateforme . "</p>
-            ";
+                  ";
 
-            $url = appelApiEmail();
-            $template = View::make('email.index', ['contenumess' => $message])->render();
-            $data = [
-                'provider' => 'CIAPOL <info@mail-taseti.com>',
-                "key_rsa" => 're_2i7H3Ynf_KRVm9VwTsrwrfF8isCBYvyyE',
-                "destination" => $email,
-                "sujet" => $sujet,
-                "message" => $template
-            ];
+                $url = appelApiEmail();
+                $template = View::make('email.index', ['contenumess' => $message])->render();
+                $data = [
+                    'provider' => 'CIAPOL <info@mail-taseti.com>',
+                    "key_rsa" => 're_2i7H3Ynf_KRVm9VwTsrwrfF8isCBYvyyE',
+                    "destination" => $email,
+                    "sujet" => $sujet,
+                    "message" => $template
+                ];
 
-            $retourAPI = Http::post($url, $data);
-            $res = $retourAPI->json();
+                $retourAPI = Http::post($url, $data);
+                $res = $retourAPI->json();
 
-            if ($retourAPI->status() == 200) {
-                (int)$code = $res['status'];
-                if ($code != 200) {
-                    $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
-                    // Log::ajoutLOG($message);
-                    $module = "Envoyer de Mail validation cheque Entreprise ";
-                    $action = "Echec d'envoyer de mail  : $message";
-                    Logs::saveLog($module, $action);
+                if ($retourAPI->status() == 200) {
+                    (int)$code = $res['status'];
+                    if ($code != 200) {
+                        $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
+                        // Log::ajoutLOG($message);
+                        $module = "Envoyer de Mail validation cheque Entreprise ";
+                        $action = "Echec d'envoyer de mail  : $message";
+                        Logs::saveLog($module, $action);
+                    } else {
+
+                        $module = "Envoyer de Mail  validation cheque client Entreprise";
+                        $action = "Email envoyer avec success   : $entreprise->raison_sociale sur son email  $email ";
+                        Logs::saveLog($module, $action);
+                    }
                 } else {
-                    DB::commit();
-                    $module = "Envoyer de Mail  validation cheque client Entreprise";
-                    $action = "Email envoyer avec success   : $entreprise->raison_sociale sur son email  $email ";
-                    Logs::saveLog($module, $action);
+                    Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
                 }
-            } else {
-                Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
             }
-
 
             $module = "Module Cheque Paiement ";
             $action = "A valide le cheque ayant l'id = $id donc valide le paiement $paiement->id ";
@@ -305,77 +312,78 @@ class ChequeController extends Controller
     {
         $cheque = Cheque::find($id);
         $entreprise = Entreprise::find($cheque->entreprise_id);
-        $email = $entreprise->user->email;
+        $email = $entreprise->user->email ?? null;
         $cheque->motif_rejet = $request->motif_rejet;
         $cheque->administrateur_id = Auth::user()->administrateur->id;
         $cheque->status = 3;
         $cheque->save();
 
-
+        DB::commit();
         $montant = $cheque->montant;
         $lien_plateforme = urlSite();
         $nom_plateforme = "CIAPOL FACTURE";
         $telephone_support = "(+225) 2722421619";
 
+        if (!empty($email)) {
+            /// envoyer de mail a clients
+            $sujet = "Réfus  de réception de paiement";
+            $message = "
+                    <p>Cher(e) " . $entreprise->raison_sociale . ",</p>
 
-        /// envoyer de mail a clients
-        $sujet = "Refus  de réception de paiement";
-        $message = "
-                <p>Cher(e) " . $entreprise->raison_sociale . ",</p>
+                    <p>Nous vous informons que votre paiement par " . ($cheque->NaturePaiement == 'VIREMENT' ? 'virement' : 'chèque') . " à ete refuse.</p>
 
-                <p>Nous vous informons que votre paiement par " . ($cheque->NaturePaiement == 'VIREMENT' ? 'virement' : 'chèque') . " à ete refuse.</p>
+                    <p><strong>Détails de la transaction :</strong></p>
+                    <ul>
+                        <li>Montant reçu : " . $montant . " F CFA</li>
+                        <li>Date de réception : " . date('d/m/Y') . "</li>
+                        <li>Référence : " . $cheque->numero_cheque . "</li>
+                        <li>Motif de refus : " . $cheque->motif_rejet . "</li>
+                    </ul>
 
-                <p><strong>Détails de la transaction :</strong></p>
-                <ul>
-                    <li>Montant reçu : " . $montant . " F CFA</li>
-                    <li>Date de réception : " . date('d/m/Y') . "</li>
-                    <li>Référence : " . $cheque->numero_cheque . "</li>
-                    <li>Motif de refus : " . $cheque->motif_rejet . "</li>
-                </ul>
+                    <p>Votre compte a été crédité et vous pouvez maintenant accéder à l'ensemble des fonctionnalités de notre plateforme.</p>
 
-                <p>Votre compte a été crédité et vous pouvez maintenant accéder à l'ensemble des fonctionnalités de notre plateforme.</p>
+                    <div style='text-align:center; margin:20px 0;'>
+                        <a href='" . $lien_plateforme . "' style='background-color:#007bff; color:white; padding:12px 24px; text-decoration:none; border-radius:5px; font-weight:bold;'>
+                            Accéder à la plateforme
+                        </a>
+                    </div>
 
-                <div style='text-align:center; margin:20px 0;'>
-                    <a href='" . $lien_plateforme . "' style='background-color:#007bff; color:white; padding:12px 24px; text-decoration:none; border-radius:5px; font-weight:bold;'>
-                        Accéder à la plateforme
-                    </a>
-                </div>
+                    <p>Pour toute question concernant cette transaction, n'hésitez pas à répondre à cet email ou à nous contacter au " . $telephone_support . ".</p>
 
-                <p>Pour toute question concernant cette transaction, n'hésitez pas à répondre à cet email ou à nous contacter au " . $telephone_support . ".</p>
+                    <p>Cordialement,<br>
+                    L'équipe " . $nom_plateforme . "</p>
+                ";
 
-                <p>Cordialement,<br>
-                L'équipe " . $nom_plateforme . "</p>
-            ";
+            $url = appelApiEmail();
+            $template = View::make('email.index', ['contenumess' => $message])->render();
+            $data = [
+                'provider' => 'CIAPOL <info@mail-taseti.com>',
+                "key_rsa" => 're_2i7H3Ynf_KRVm9VwTsrwrfF8isCBYvyyE',
+                "destination" => $email,
+                "sujet" => $sujet,
+                "message" => $template
+            ];
 
-        $url = appelApiEmail();
-        $template = View::make('email.index', ['contenumess' => $message])->render();
-        $data = [
-            'provider' => 'CIAPOL <info@mail-taseti.com>',
-            "key_rsa" => 're_2i7H3Ynf_KRVm9VwTsrwrfF8isCBYvyyE',
-            "destination" => $email,
-            "sujet" => $sujet,
-            "message" => $template
-        ];
+            $retourAPI = Http::post($url, $data);
+            $res = $retourAPI->json();
 
-        $retourAPI = Http::post($url, $data);
-        $res = $retourAPI->json();
+            if ($retourAPI->status() == 200) {
+                (int)$code = $res['status'];
+                if ($code != 200) {
+                    $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
+                    // Log::ajoutLOG($message);
+                    $module = "Envoyer de Mail refus cheque Entreprise ";
+                    $action = "Echec d'envoyer de mail  : $message";
+                    Logs::saveLog($module, $action);
+                } else {
 
-        if ($retourAPI->status() == 200) {
-            (int)$code = $res['status'];
-            if ($code != 200) {
-                $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
-                // Log::ajoutLOG($message);
-                $module = "Envoyer de Mail refus cheque Entreprise ";
-                $action = "Echec d'envoyer de mail  : $message";
-                Logs::saveLog($module, $action);
+                    $module = "Envoyer de Mail  refus cheque client Entreprise";
+                    $action = "Email envoyer avec success   : $entreprise->raison_sociale sur son email  $email ";
+                    Logs::saveLog($module, $action);
+                }
             } else {
-                DB::commit();
-                $module = "Envoyer de Mail  refus cheque client Entreprise";
-                $action = "Email envoyer avec success   : $entreprise->raison_sociale sur son email  $email ";
-                Logs::saveLog($module, $action);
+                Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
             }
-        } else {
-            Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
         }
 
         $module = "Module Cheque Paiement";
@@ -400,6 +408,7 @@ class ChequeController extends Controller
     public function updateMiseAjoute(UpdateChequeRequest $request, $id)
     {
         //
+        // dd($request->all());
         try {
             DB::beginTransaction();
             $idTaxe = '';
@@ -428,7 +437,7 @@ class ChequeController extends Controller
             $action = "l'administrateur avec l'id : $idAdmin viens de mettre a jour  un $request->NaturePaiement  ayant l'identifiant :$cheque->id";
             Logs::saveLog($module, $action);
             DB::commit();
-            return redirect()->route('listCheques')->with('success', ' Virement ou Chéque  mise a jour  avec succès');
+            return redirect()->route('listCheques')->with('success', ' Virement ou Chéque ou Paiement mise a jour  avec succès');
             //code...
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -440,6 +449,8 @@ class ChequeController extends Controller
                 ->with('error', 'Une erreur est survenue lors de la mise a jour du chèque ou virement: ' . $e->getMessage());
         }
     }
+
+
 
     public function suppressionCheque($id)
     {
@@ -468,5 +479,151 @@ class ChequeController extends Controller
         $libelle = 'liste des Cheques et Virement';
         $pdf = PDF::loadView('dashboards.entreprise.pdf', compact('entreprises', 'libelle', 'pas'));
         return $pdf->download('cheque et virement.pdf');
+    }
+
+
+    public function desactivationCheque($id)
+    {
+        $idAdmin = Auth::user()->administrateur->id;
+        $cheque = Cheque::findOrFail($id);
+        $cheque->administrateur_id = $idAdmin;
+        $cheque->status = DESACTIVE();
+        $cheque->save();
+        $module = "Module Cheque ";
+        $action = " l'administrateur ayant l'id : $idAdmin ,A desactiver le cheque ou virement ayant l'id : $id";
+        Logs::saveLog($module, $action);
+        return redirect()->route('listCheques')->with('success', 'Chèque ou Virement ou espece desactivé avec succès');
+    }
+    public function restaureCheque($id)
+    {
+        $idAdmin = Auth::user()->administrateur->id;
+        $cheque = Cheque::findOrFail($id);
+        $cheque->administrateur_id = $idAdmin;
+        $cheque->status = ENATTENTE();
+        $cheque->save();
+        // $cheque->delete();
+        $module = "Module Cheque ";
+        $action = " l'administrateur ayant l'id : $idAdmin ,A restaure le cheque ou virement ou espece ayant l'id : $id";
+        Logs::saveLog($module, $action);
+        return redirect()->route('listCheques')->with('success', 'Chèque ou Virement ou espece resteauré avec succès');
+    }
+
+    // Annulation de paiement  apres validation
+    public function annulationPaiementApresValidation(Request $request, $id)
+    {
+        $cheque = Cheque::find($id);
+        $libelle = $cheque->taxe_entreprise_id
+                ? "Paiement par $cheque->NaturePaiement du : " . $cheque->taxeEntreprise->periode
+                : "Paiement par $cheque->NaturePaiement de Toutes les factures";
+        $paiementInitiale = PaiementInitial::where('entreprise_id', $cheque->entreprise_id)
+            ->where('montant', $cheque->montant)
+            ->where('entite', $libelle)
+            ->where('status', 1)
+            ->first();
+        $paiement = Paiement::where('entreprise_id', $cheque->entreprise_id)
+            ->where('montant', $cheque->montant)
+            ->where('entite', $libelle)
+            ->where('status', 1)
+            ->first();
+
+        // mise a jour des taxe Enteprise
+        if (!empty($cheque->taxe_entreprise_id)) {
+            $taxeEntreprise = TaxeEntreprise::where('id', $cheque->taxe_entreprise_id)->first();
+            $taxeEntreprise->status = 2;
+            $taxeEntreprise->administrateur_id = Auth::user()->administrateur->id;
+            $taxeEntreprise->save();
+        } else {
+            $taxeEt = TaxeEntreprise::where('entreprise_id', $cheque->entreprise_id)
+                ->where('status', 1)
+                ->get();
+            foreach ($taxeEt as $taxe) {
+                $taxe->status = 2;
+                $taxe->administrateur_id = Auth::user()->administrateur->id;
+                $taxe->save();
+            }
+        }
+        $entreprise = Entreprise::find($cheque->entreprise_id);
+        $email = $entreprise->user->email ?? null;
+        $cheque->motif_rejet = $request->motif_anulation;
+        $cheque->administrateur_id = Auth::user()->administrateur->id;
+        $cheque->status = ANNUELMANUEL();
+        $cheque->save();
+
+        $paiement->status = 2;
+        $paiement->save();
+
+        $paiementInitiale->status = 2;
+        $paiementInitiale->save();
+        DB::commit();
+        $montant = $cheque->montant;
+        $lien_plateforme = urlSite();
+        $nom_plateforme = "CIAPOL FACTURE";
+        $telephone_support = "(+225) 2722421619";
+
+        if (!empty($email)) {
+            $sujet = "Réfus  de réception de paiement";
+            $message = "
+                    <p>Cher(e) " . $entreprise->raison_sociale . ",</p>
+
+                    <p>Nous vous informons que votre paiement par " . ($cheque->NaturePaiement == 'VIREMENT' ? 'virement' : 'chèque') . " à ete refuse.</p>
+
+                    <p><strong>Détails de la transaction :</strong></p>
+                    <ul>
+                        <li>Montant reçu : " . $montant . " F CFA</li>
+                        <li>Date de réception : " . date('d/m/Y') . "</li>
+                        <li>Référence : " . $cheque->numero_cheque . "</li>
+                        <li>Motif de refus : " . $cheque->motif_rejet . "</li>
+                    </ul>
+
+                    <p>Votre compte a été crédité et vous pouvez maintenant accéder à l'ensemble des fonctionnalités de notre plateforme.</p>
+
+                    <div style='text-align:center; margin:20px 0;'>
+                        <a href='" . $lien_plateforme . "' style='background-color:#007bff; color:white; padding:12px 24px; text-decoration:none; border-radius:5px; font-weight:bold;'>
+                            Accéder à la plateforme
+                        </a>
+                    </div>
+
+                    <p>Pour toute question concernant cette transaction, n'hésitez pas à répondre à cet email ou à nous contacter au " . $telephone_support . ".</p>
+
+                    <p>Cordialement,<br>
+                    L'équipe " . $nom_plateforme . "</p>
+                ";
+
+            $url = appelApiEmail();
+            $template = View::make('email.index', ['contenumess' => $message])->render();
+            $data = [
+                'provider' => 'CIAPOL <info@mail-taseti.com>',
+                "key_rsa" => 're_2i7H3Ynf_KRVm9VwTsrwrfF8isCBYvyyE',
+                "destination" => $email,
+                "sujet" => $sujet,
+                "message" => $template
+            ];
+
+            $retourAPI = Http::post($url, $data);
+            $res = $retourAPI->json();
+
+            if ($retourAPI->status() == 200) {
+                (int)$code = $res['status'];
+                if ($code != 200) {
+                    $message = "Une erreur s'est produite " . $code . ", DETAIL: " . messageBrut($res['message']) . " ERR: Inscritpion";
+                    // Log::ajoutLOG($message);
+                    $module = "Envoyer de Mail refus cheque Entreprise ";
+                    $action = "Echec d'envoyer de mail  : $message";
+                    Logs::saveLog($module, $action);
+                } else {
+
+                    $module = "Envoyer de Mail  refus cheque client Entreprise";
+                    $action = "Email envoyer avec success   : $entreprise->raison_sociale sur son email  $email ";
+                    Logs::saveLog($module, $action);
+                }
+            } else {
+                Log::error("Erreur lors de l'envoi de l'email. Statut API : " . $retourAPI->status());
+            }
+        }
+
+        $module = "Module Cheque Paiement";
+        $action = "A annuel paiement apres validation,  le cheque ou virement ou espece  ayant l'id = $id ";
+        Logs::saveLog($module, $action);
+        return redirect()->route('listCheques')->with('success', 'Chèque ou virement ou Espece annuel apres validation  avec succès');
     }
 }

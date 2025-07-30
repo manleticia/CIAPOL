@@ -122,6 +122,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/miseajourCheque/{id}','updateMiseAjoute')->name('cheque.update');
 
             Route::post('/desactiverCheque/{id}','suppressionCheque')->name('cheque.desactive');
+
+            Route::post('/desactivationCheque/{id}','desactivationCheque')->name('cheque.desAc');
+            Route::post('/restaurationdeCheque/{id}','restaureCheque')->name('cheque.restore');
+            Route::post('/annulationapresValidation/{id}','annulationPaiementApresValidation')->name('cheque.annuleAfterValide');
         });
 
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use DateTime;
 use Carbon\Carbon;
 use App\Models\Logs;
+
 use App\Models\Cheque;
 use App\Models\Entreprise;
 use Illuminate\Http\Request;
@@ -17,17 +18,13 @@ class DashboardController extends Controller
     //
     public function index()
     {
-        $paiImpay = PaiementInitial::where('status', '3')->sum('montant');
+        $paiImpay = Cheque::where('status', ANNUELMANUEL())->count();
         $paiValid = PaiementInitial::where('status', '1')->sum('montant');
-        // $paiements = PaiementInitial::where('status', '1')->get();
         $paiements = PaiementInitial::where('status', '1')
             ->whereDate('created_at', Carbon::today())
             ->get();
         $nbreEntre = Entreprise::count();
         $virement = Cheque::where('status', 2)->count();
-
-
-
         $today = now()->format('Y-m-d');
         $todayPayments = PaiementInitial::whereDate('created_at', $today)
             ->where('status', '1')->get();
@@ -36,8 +33,6 @@ class DashboardController extends Controller
             ->get();
         $validatedPercentage = PaiementInitial::whereDate('created_at', $today)->percentageValidated();
         $paymentMethods = PaiementInitial::whereDate('created_at', $today)->groupByMethod();
-        // dd($paymentMethods);
-        // $monthlyPayments = PaiementInitial::thisMonth()->dailySum();
         $monthlyPayments = PaiementInitial::selectRaw('
         YEAR(datePaiement) as year,
         MONTH(datePaiement) as month,
@@ -48,9 +43,6 @@ class DashboardController extends Controller
             ->orderBy('year')
             ->orderBy('month')
             ->get();
-
-        // $taxesDistribution = PaiementInitial::with('taxe_entreprise')->whereDate('created_at', $today)->groupByTaxe();
-
         $taxesDistribution = PaiementInitial::with('taxeEntreprise')
             ->whereDate('datePaiement', $today)
             ->groupByTaxe()
@@ -62,11 +54,8 @@ class DashboardController extends Controller
                     'total' => $item->montant // Utilisation du bon nom de colonne
                 ];
             });
-
         $topCompanies = PaiementInitial::with('entreprise')->whereDate('created_at', $today)->topCompanies(5);
-        // dd($topCompanies);
         $todayPaymentsByHour = PaiementInitial::todayByHour();
-
         $module = "Module Tableau de bord ";
         $action = "A consulter le tableau de bord administrateur";
         Logs::saveLog($module, $action);
