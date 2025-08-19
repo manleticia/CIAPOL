@@ -46,9 +46,17 @@ class ChequeController extends Controller
     {
         //
         // $entreprises = Entreprise::All();
+        // $entreprises = Entreprise::whereHas('taxesEntreprises', function ($query) {
+        //     $query->where('status', 2);
+        // })->get();
+        // dd($entreprises);
+
         $entreprises = Entreprise::whereHas('taxesEntreprises', function ($query) {
             $query->where('status', 2);
-        })->get();
+        })
+            ->orderBy('raison_sociale', 'asc')
+            ->get();
+
         // dd($entreprises);
         $module = "Module Cheque ";
         $action = "A  consulter la page enregistrement des cheques ou virements ";
@@ -396,7 +404,11 @@ class ChequeController extends Controller
     public function editer($id)
     {
 
-        $entreprises = Entreprise::All();
+        $entreprises = Entreprise::whereHas('taxesEntreprises', function ($query) {
+            $query->where('status', 2);
+        })
+            ->orderBy('raison_sociale', 'asc')
+            ->get();
         $cheque = Cheque::findOrFail($id);
         // dd($cheque);
         $module = "Module Cheque ";
@@ -513,8 +525,8 @@ class ChequeController extends Controller
     {
         $cheque = Cheque::find($id);
         $libelle = $cheque->taxe_entreprise_id
-                ? "Paiement par $cheque->NaturePaiement du : " . $cheque->taxeEntreprise->periode
-                : "Paiement par $cheque->NaturePaiement de Toutes les factures";
+            ? "Paiement par $cheque->NaturePaiement du : " . $cheque->taxeEntreprise->periode
+            : "Paiement par $cheque->NaturePaiement de Toutes les factures";
         $paiementInitiale = PaiementInitial::where('entreprise_id', $cheque->entreprise_id)
             ->where('montant', $cheque->montant)
             ->where('entite', $libelle)

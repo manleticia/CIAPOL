@@ -206,7 +206,7 @@
                                 </div>
                             @endif
                             @if ($cheque->status == 1)
-                                <div class="card" style="display: none">
+                                <div class="card" style="display: block">
                                     <div class="card-header bg-light">
                                         <h5 class="mb-0">Actions</h5>
                                     </div>

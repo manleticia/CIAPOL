@@ -60,7 +60,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-4 mt-2" style="display: none">
+        <div class="col-4 mt-2" style="display: block">
             <div class="card lift">
                 <div class="card-body py-xl-4 py-3">
                     <span class="text-muted ">Nombre (chèques / virements / espèces) annuels <br> Apres Validation</span>

@@ -30,7 +30,8 @@
             margin-top: 5px;
         }
     </style>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+    {{-- <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"> --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 @endpush
 @section('content')
@@ -134,7 +135,8 @@
                                             Chèque</option>
                                         <option value="VIREMENT"
                                             {{ old('NaturePaiement') == 'VIREMENT' ? 'selected' : '' }}>Virement</option>
-                                        <option value="ESPECE" {{ old('NaturePaiement') == 'ESPECE' ? 'selected' : '' }}>Espece
+                                        <option value="ESPECE" {{ old('NaturePaiement') == 'ESPECE' ? 'selected' : '' }}>
+                                            Espece
                                         </option>
                                     </select>
                                     @error('NaturePaiement')
@@ -223,7 +225,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-12" id="titu" >
+                            <div class="col-lg-4 col-md-12" id="titu">
                                 <div class="form-group">
                                     <label for="titulaire">Nom du titulaire du compte <span
                                             class="text-danger fw-bold">*</span></label>
@@ -386,15 +388,17 @@
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            // $('.select2').select2({
-            //     placeholder: "Sélectionnez une option",
-            //     allowClear: true
-            // });
 
+        //    $('.select2').select2({
+        //         placeholder: "Sélectionnez une option",
+        //         allowClear: true
+        //     });
             $('#entreprise_id').on('change', function() {
+
                 const messageInput = document.getElementById("feedback");
                 messageInput.innerHTML = '';
                 messageInput.style = "font-size: 16px";
@@ -402,6 +406,7 @@
                 const select = $('#taxe_entreprise');
                 select.prop('disabled', true);
                 $('#taxe_entreprise').empty().append('<option value="0">⏳ Chargement...</option>');
+
                 if (selectedValue === '') {
                     $('#taxe_entreprise').empty().append(
                         '<option value="0">Sélectionnez d\'abord une entreprise</option>');
@@ -492,6 +497,9 @@
                     .finally(() => {
                         select.prop('disabled', false);
                     });
+
+
+
             });
 
             $('#taxe_entreprise').on('change', function() {
@@ -510,4 +518,9 @@
             });
         });
     </script>
+
+
+
+
+
 @endpush
